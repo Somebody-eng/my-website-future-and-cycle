@@ -43,6 +43,9 @@ PUBLIC_SITE_URL=https://future-cycle.pages.dev
 PUBLIC_ADSENSE_ENABLED=false
 PUBLIC_ADSENSE_CLIENT=
 PUBLIC_GA_ID=
+PUBLIC_GISCUS_ENABLED=false
+PUBLIC_GISCUS_REPO_ID=
+PUBLIC_GISCUS_CATEGORY_ID=
 ```
 
 说明：
@@ -51,6 +54,15 @@ PUBLIC_GA_ID=
 - `PUBLIC_ADSENSE_ENABLED`：验证期保持 `false`，页面不会加载广告代码，也不会显示广告空白。
 - `PUBLIC_ADSENSE_CLIENT`：后续 AdSense 客户端 ID。
 - `PUBLIC_GA_ID`：后续 Google Analytics Measurement ID。
+- `PUBLIC_GISCUS_ENABLED`：设为 `true` 后在文章页加载 Giscus 评论。
+- `PUBLIC_GISCUS_REPO_ID`：Giscus 使用的 GitHub 仓库 ID。
+- `PUBLIC_GISCUS_CATEGORY_ID`：Giscus 使用的 Discussions 分类 ID。
+
+## 留言互动
+
+文章页默认显示“去 GitHub 留言”，读者可以在仓库 Issues 中创建与当前文章关联的公开讨论。该模式免费、无需数据库，也不会加载额外评论脚本。
+
+需要启用页内评论时，在公开 GitHub 仓库中开启 Discussions、安装 Giscus App，并在 [giscus.app/zh-CN](https://giscus.app/zh-CN) 获取仓库 ID 和分类 ID。随后设置上述三个 Giscus 环境变量并重新部署。未填写完整配置时，网站会自动保留 GitHub Issues 留言入口。
 
 ## 内容结构
 

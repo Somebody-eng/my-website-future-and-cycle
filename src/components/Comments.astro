@@ -1,0 +1,135 @@
+---
+import { ArrowUpRight, MessageCircle } from "@lucide/astro";
+
+interface Props {
+  title: string;
+  slug: string;
+}
+
+const { title, slug } = Astro.props;
+const repo = "Somebody-eng/my-website-future-and-cycle";
+const repoId = import.meta.env.PUBLIC_GISCUS_REPO_ID ?? "";
+const categoryId = import.meta.env.PUBLIC_GISCUS_CATEGORY_ID ?? "";
+const giscusEnabled = import.meta.env.PUBLIC_GISCUS_ENABLED === "true" && repoId && categoryId;
+const siteBase = Astro.site?.href.endsWith("/") ? Astro.site.href : `${Astro.site?.href ?? Astro.url.origin}/`;
+const articleUrl = new URL(`posts/${slug}/`, siteBase).href;
+const issueTitle = `文章留言：${title}`;
+const issueBody = `我想讨论这篇文章：${articleUrl}\n\n我的想法：\n`;
+const issueUrl = `https://github.com/${repo}/issues/new?title=${encodeURIComponent(issueTitle)}&body=${encodeURIComponent(issueBody)}`;
+---
+
+<section class="comments" aria-labelledby="comments-title">
+  <header>
+    <span class="icon"><MessageCircle size={18} stroke-width={1.7} aria-hidden="true" /></span>
+    <div>
+      <h2 id="comments-title">留言互动</h2>
+      <p>围绕文章讨论观点与案例，请保持具体、友善和独立思考。</p>
+    </div>
+  </header>
+
+  {giscusEnabled ? (
+    <div class="giscus-shell">
+      <script
+        is:inline
+        src="https://giscus.app/client.js"
+        data-repo={repo}
+        data-repo-id={repoId}
+        data-category="文章留言"
+        data-category-id={categoryId}
+        data-mapping="pathname"
+        data-strict="1"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="light"
+        data-lang="zh-CN"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async
+      ></script>
+    </div>
+  ) : (
+    <div class="fallback">
+      <p>留言暂由 GitHub Issues 承载，点击后可围绕本文创建公开讨论。</p>
+      <a href={issueUrl} target="_blank" rel="noopener noreferrer">
+        去 GitHub 留言
+        <ArrowUpRight size={15} stroke-width={1.7} aria-hidden="true" />
+      </a>
+    </div>
+  )}
+</section>
+
+<style>
+  .comments {
+    margin-top: 24px;
+    padding: 22px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  header {
+    display: flex;
+    gap: 11px;
+    align-items: flex-start;
+  }
+
+  .icon {
+    display: grid;
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border: 1px solid var(--accent-line);
+    border-radius: 50%;
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  h2 {
+    margin: 0 0 3px;
+    font-size: 0.92rem;
+    font-weight: 650;
+  }
+
+  header p,
+  .fallback p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.72rem;
+    line-height: 1.6;
+  }
+
+  .giscus-shell,
+  .fallback {
+    margin-top: 18px;
+  }
+
+  .fallback {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  .fallback a {
+    display: inline-flex;
+    flex: 0 0 auto;
+    gap: 6px;
+    align-items: center;
+    color: var(--accent);
+    font-size: 0.72rem;
+    font-weight: 620;
+    text-decoration: none;
+  }
+
+  @media (max-width: 540px) {
+    .fallback {
+      display: grid;
+      justify-items: start;
+    }
+  }
+</style>

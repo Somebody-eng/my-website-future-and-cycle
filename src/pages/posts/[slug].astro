@@ -4,6 +4,7 @@ import AdSlot from "@components/AdSlot.astro";
 import ArticleTOC from "@components/ArticleTOC.astro";
 import AuthorBox from "@components/AuthorBox.astro";
 import Breadcrumb from "@components/Breadcrumb.astro";
+import Comments from "@components/Comments.astro";
 import Disclaimer from "@components/Disclaimer.astro";
 import RelatedPosts from "@components/RelatedPosts.astro";
 import { editorProfile } from "@lib/people";
@@ -83,6 +84,7 @@ const related = getRelatedPosts(post, allPosts);
 
         <AdSlot slot="article-bottom" label="文章底部广告" />
         <AuthorBox author={post.data.author} />
+        <Comments title={post.data.title} slug={post.slug} />
         <RelatedPosts posts={related} />
       </div>
 
