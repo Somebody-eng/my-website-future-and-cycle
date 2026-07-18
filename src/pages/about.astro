@@ -1,0 +1,35 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
+---
+
+<BaseLayout title="关于本站" description="了解未来与周期的定位、内容边界和写作原则。" canonical="/about/">
+  <section class="section document-page">
+    <div class="container document-grid">
+      <aside><span>01</span><strong>关于本站</strong></aside>
+      <article class="prose">
+        <Breadcrumb items={[{ label: "关于本站" }]} />
+        <p class="eyebrow">ABOUT FUTURE & CYCLE</p>
+        <h1>把商业世界看得更长一些</h1>
+        <p class="lead">《未来与周期｜长期主义商业思想笔记》是一个中文商业思想博客，关注长期主义、现金流、护城河、定价权、资本配置与理性决策。</p>
+        <h2>我们研究什么</h2>
+        <p>本站讨论巴菲特、查理·芒格、段永平、贝索斯、黄仁勋、马斯克等人物的方法论，也拆解企业经营案例和经典商业文本。重点不是预测价格，而是理解一家企业如何创造价值、一个普通人如何做更稳健的长期选择。</p>
+        <h2>写作原则</h2>
+        <p>尽量回到原始资料，区分事实、观点与推断；不做大段版权内容翻译；用可迁移的商业常识代替口号；对不确定性保持诚实。</p>
+        <h2>明确边界</h2>
+        <p>本站不做荐股网站，不提供买卖建议，不承诺任何收益。所有文章默认仅用于商业与投资教育讨论，不构成任何投资建议。</p>
+      </article>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .document-page { padding-top: 42px; }
+  .document-grid { display: grid; grid-template-columns: 180px minmax(0, 720px); gap: 72px; justify-content: center; }
+  aside { display: grid; align-content: start; gap: 8px; padding-top: 92px; color: var(--muted); font-size: 13px; }
+  aside span { color: var(--accent); font-weight: 700; }
+  .eyebrow { margin-top: 54px; color: var(--accent); font-size: 12px; font-weight: 700; }
+  h1 { font-size: 42px; }
+  .lead { font-size: 20px; color: var(--text); }
+  @media (max-width: 800px) { .document-grid { display: block; } aside { display: none; } .eyebrow { margin-top: 36px; } h1 { font-size: 34px; } }
+</style>

@@ -1,0 +1,97 @@
+<section class="knowledge" aria-labelledby="knowledge-title">
+  <h2 id="knowledge-title">长期主义研究图谱</h2>
+  <div class="arc" aria-label="现金流、护城河、定价权和资本配置构成的长期主义研究图谱">
+    <span class="node cash">现金流<i></i></span>
+    <span class="node moat">护城河<i></i></span>
+    <span class="node price">定价权<i></i></span>
+    <span class="node capital">资本配置<i></i></span>
+  </div>
+  <p>以现金流为底座，构建护城河，获得定价权，通过资本配置实现复利式增长。</p>
+</section>
+
+<style>
+  .knowledge {
+    text-align: center;
+  }
+
+  h2 {
+    margin: 0 0 28px;
+    font-size: 0.95rem;
+    font-weight: 650;
+  }
+
+  .arc {
+    position: relative;
+    width: min(100%, 460px);
+    aspect-ratio: 2 / 1;
+    margin: 0 auto;
+    overflow: visible;
+    border-radius: 460px 460px 0 0;
+    background:
+      radial-gradient(circle at 50% 100%, #fff 0 25%, transparent 25.5%),
+      linear-gradient(135deg, #fff2ee 0%, #ffb6a5 52%, #ff6b4d 100%);
+  }
+
+  .arc::before,
+  .arc::after {
+    position: absolute;
+    inset: 22% 11% 0;
+    border: 1px solid rgba(255, 90, 60, 0.45);
+    border-bottom: 0;
+    border-radius: 360px 360px 0 0;
+    content: "";
+  }
+
+  .arc::after {
+    inset: 50% 29% 0;
+  }
+
+  .node {
+    position: absolute;
+    z-index: 1;
+    font-size: 0.9rem;
+    font-weight: 620;
+    white-space: nowrap;
+  }
+
+  .node i {
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 1px rgba(255, 90, 60, 0.28);
+  }
+
+  .cash { top: 42%; left: -1%; }
+  .cash i { top: 28px; right: -9px; }
+  .moat { top: -12%; left: 50%; transform: translateX(-50%); }
+  .moat i { top: 31px; left: 50%; transform: translateX(-50%); }
+  .price { top: 42%; right: -1%; }
+  .price i { top: 28px; left: -9px; }
+  .capital { bottom: 17%; left: 50%; transform: translateX(-50%); }
+  .capital i { top: 29px; left: 50%; transform: translateX(-50%); }
+
+  p {
+    max-width: 420px;
+    margin: 18px auto 0;
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.75;
+  }
+
+  @media (max-width: 720px) {
+    h2 {
+      margin-bottom: 34px;
+      text-align: left;
+    }
+
+    .node {
+      font-size: 0.78rem;
+    }
+
+    .cash { left: 0; }
+    .price { right: 0; }
+  }
+</style>

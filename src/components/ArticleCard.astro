@@ -1,0 +1,167 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { ArrowUpRight, BrainCircuit, BriefcaseBusiness, ChartNoAxesCombined, Cpu, Landmark, UserRound } from "@lucide/astro";
+import { categoryHref } from "@lib/site";
+
+interface Props {
+  post: CollectionEntry<"posts">;
+  variant?: "card" | "row" | "featured";
+}
+
+const { post, variant = "card" } = Astro.props;
+const category = post.data.category;
+const Icon = category.includes("AI")
+  ? Cpu
+  : category.includes("芒格")
+    ? BrainCircuit
+    : category.includes("普通人")
+      ? UserRound
+      : category.includes("案例")
+        ? BriefcaseBusiness
+        : category.includes("股东信")
+          ? Landmark
+          : ChartNoAxesCombined;
+---
+
+<article class={`article-card ${variant}`}>
+  {variant !== "row" && (
+    <div class="icon-frame" aria-hidden="true"><Icon size={27} stroke-width={1.35} /></div>
+  )}
+  <div class="body">
+    <a class="category" href={categoryHref(category)}>{category}</a>
+    <h2><a href={`/posts/${post.slug}/`}>{post.data.title}</a></h2>
+    {variant !== "row" && <p>{post.data.description}</p>}
+    <div class="meta">
+      <time datetime={post.data.date.toISOString()}>{post.data.date.toLocaleDateString("zh-CN")}</time>
+      <span>{post.data.readingTime} 分钟阅读</span>
+      {variant !== "row" && <span>{post.data.tags.slice(0, 2).join(" · ")}</span>}
+    </div>
+  </div>
+  <a class="arrow" href={`/posts/${post.slug}/`} aria-label={`阅读${post.data.title}`}>
+    <ArrowUpRight size={17} stroke-width={1.5} aria-hidden="true" />
+  </a>
+</article>
+
+<style>
+  .article-card {
+    position: relative;
+    display: grid;
+    min-width: 0;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 16px;
+    align-items: center;
+    min-height: 116px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  .article-card:hover {
+    border-color: var(--accent-line);
+    box-shadow: 0 10px 30px rgba(18, 18, 18, 0.06);
+    transform: translateY(-2px);
+  }
+
+  .article-card.row {
+    min-height: 0;
+    padding: 14px 0;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+  }
+
+  .article-card.row:hover {
+    box-shadow: none;
+    transform: none;
+  }
+
+  .icon-frame {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    border: 1px solid #f0c8bd;
+    border-radius: 50%;
+    color: var(--text-soft);
+    background: #fff;
+  }
+
+  .body {
+    min-width: 0;
+  }
+
+  .category {
+    color: var(--accent);
+    font-size: 0.7rem;
+    font-weight: 650;
+    text-decoration: none;
+  }
+
+  h2 {
+    margin: 4px 0 6px;
+    font-size: 1rem;
+    font-weight: 630;
+    line-height: 1.45;
+  }
+
+  h2 a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  p {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-size: 0.77rem;
+    line-height: 1.6;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 12px;
+    color: var(--muted-light);
+    font-size: 0.68rem;
+  }
+
+  .row .meta time,
+  .row .category {
+    display: none;
+  }
+
+  .arrow {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    color: var(--text-soft);
+    text-decoration: none;
+  }
+
+  @media (max-width: 720px) {
+    .article-card {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      min-height: 108px;
+      padding: 14px;
+    }
+
+    .icon-frame {
+      width: 48px;
+      height: 48px;
+    }
+
+    h2 {
+      font-size: 0.94rem;
+    }
+
+    p {
+      display: none;
+    }
+  }
+</style>

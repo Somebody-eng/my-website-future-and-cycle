@@ -1,0 +1,35 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
+import { Mail, MessageSquareText } from "@lucide/astro";
+---
+
+<BaseLayout title="联系方式" description="联系未来与周期编辑部。" canonical="/contact/">
+  <section class="section contact-page"><div class="container contact-inner">
+    <Breadcrumb items={[{ label: "联系方式" }]} />
+    <header>
+      <p>CONTACT</p>
+      <h1>一起讨论值得长期研究的问题</h1>
+      <span>欢迎提供内容纠错、原始资料线索与商业案例建议。</span>
+    </header>
+    <div class="contact-list">
+      <a href="mailto:hello@example.com"><Mail size={22} stroke-width={1.7} /><span><small>电子邮件</small><strong>hello@example.com</strong></span></a>
+      <div><MessageSquareText size={22} stroke-width={1.7} /><span><small>内容说明</small><strong>正式上线前请替换为真实联系邮箱</strong></span></div>
+    </div>
+  </div></section>
+</BaseLayout>
+
+<style>
+  .contact-page { padding-top: 42px; }
+  .contact-inner { max-width: 820px; }
+  header { margin: 66px 0 48px; max-width: 680px; }
+  header p { color: var(--accent); font-size: 12px; font-weight: 700; }
+  h1 { margin: 12px 0 18px; font-size: 42px; line-height: 1.25; }
+  header span { color: var(--muted); font-size: 17px; }
+  .contact-list { border-top: 1px solid var(--line); }
+  .contact-list > * { display: grid; grid-template-columns: 36px 1fr; gap: 16px; align-items: center; min-height: 94px; padding: 18px 4px; border-bottom: 1px solid var(--line); color: var(--text); text-decoration: none; }
+  .contact-list svg { color: var(--accent); }
+  .contact-list span { display: grid; gap: 6px; }
+  .contact-list small { color: var(--muted); font-weight: 400; }
+  @media (max-width: 640px) { header { margin: 42px 0 34px; } h1 { font-size: 32px; } }
+</style>

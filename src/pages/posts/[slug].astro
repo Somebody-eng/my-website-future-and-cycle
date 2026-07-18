@@ -1,0 +1,338 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/AdSlot.astro";
+import ArticleTOC from "@components/ArticleTOC.astro";
+import AuthorBox from "@components/AuthorBox.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
+import Disclaimer from "@components/Disclaimer.astro";
+import RelatedPosts from "@components/RelatedPosts.astro";
+import { editorProfile } from "@lib/people";
+import { categoryHref, tagHref } from "@lib/site";
+import { getPublishedPosts, getRelatedPosts } from "@lib/posts";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await post.render();
+const allPosts = await getPublishedPosts();
+const related = getRelatedPosts(post, allPosts);
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  image={post.data.coverImage}
+  canonical={`/posts/${post.slug}/`}
+  type="article"
+>
+  <article class="article-page container">
+    <Breadcrumb items={[{ label: post.data.category, href: categoryHref(post.data.category) }, { label: post.data.title }]} />
+    <div class="article-layout">
+      <div class="article-main">
+        <header class="article-header">
+          <a class="category" href={categoryHref(post.data.category)}>{post.data.category}</a>
+          <h1>{post.data.title}</h1>
+          <p class="description">{post.data.description}</p>
+          <div class="author-meta">
+            <img src={editorProfile.image} alt={editorProfile.imageAlt} />
+            <div>
+              <strong>{post.data.author}</strong>
+              <span>
+                <time datetime={post.data.date.toISOString()}>{post.data.date.toLocaleDateString("zh-CN")}</time>
+                · 更新于 {post.data.updatedDate.toLocaleDateString("zh-CN")} · {post.data.readingTime} 分钟阅读
+              </span>
+            </div>
+          </div>
+        </header>
+
+        <Disclaimer text={post.data.disclaimer} />
+        <ArticleTOC headings={headings} mode="mobile" />
+        <AdSlot slot="article-top" label="文章顶部广告" />
+
+        <div class="key-points" aria-label="文章关键词">
+          <strong>关键要点</strong>
+          <div>{post.data.tags.slice(0, 4).map((tag) => <span>{tag}</span>)}</div>
+        </div>
+
+        <div class="prose article-prose">
+          <Content />
+        </div>
+
+        <AdSlot slot="article-middle" label="正文中部广告" />
+
+        {post.data.sources.length > 0 && (
+          <section class="sources">
+            <h2>资料来源</h2>
+            <ol>
+              {post.data.sources.map((source) => (
+                <li>
+                  {source.url ? <a href={source.url} rel="nofollow noopener" target="_blank">{source.title}</a> : <span>{source.title}</span>}
+                  {source.note && <small>{source.note}</small>}
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
+
+        <div class="tag-list" aria-label="文章标签">
+          {post.data.tags.map((tag) => <a href={tagHref(tag)}>{tag}</a>)}
+        </div>
+
+        <AdSlot slot="article-bottom" label="文章底部广告" />
+        <AuthorBox author={post.data.author} />
+        <RelatedPosts posts={related} />
+      </div>
+
+      <aside class="article-sidebar">
+        <div class="progress-motif" aria-hidden="true">
+          <span>阅读路径</span>
+          <div></div>
+          <small>从问题到方法</small>
+        </div>
+        <ArticleTOC headings={headings} mode="desktop" />
+      </aside>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .article-page {
+    padding-top: 30px;
+    padding-bottom: 60px;
+  }
+
+  .article-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 760px) 238px;
+    gap: 72px;
+    justify-content: center;
+    margin-top: 22px;
+  }
+
+  .article-main {
+    min-width: 0;
+  }
+
+  .article-header {
+    margin-bottom: 20px;
+  }
+
+  .category {
+    display: inline-block;
+    margin-bottom: 9px;
+    color: var(--accent);
+    font-size: 0.72rem;
+    font-weight: 650;
+    text-decoration: none;
+  }
+
+  h1 {
+    margin: 0 0 11px;
+    font-size: 38px;
+    font-weight: 640;
+    line-height: 1.25;
+    letter-spacing: 0;
+  }
+
+  .description {
+    margin: 0 0 18px;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  .author-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .author-meta img {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+  }
+
+  .author-meta div {
+    display: grid;
+  }
+
+  .author-meta strong {
+    font-size: 0.76rem;
+    font-weight: 620;
+  }
+
+  .author-meta span {
+    color: var(--muted);
+    font-size: 0.68rem;
+  }
+
+  .key-points {
+    margin: 28px 0 8px;
+    padding: 12px 14px;
+    border: 1px solid var(--accent-line);
+    border-radius: var(--radius);
+    background: var(--accent-soft);
+  }
+
+  .key-points > strong {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--accent);
+    font-size: 0.72rem;
+  }
+
+  .key-points div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+  }
+
+  .key-points span {
+    position: relative;
+    padding-left: 10px;
+    color: var(--text-soft);
+    font-size: 0.7rem;
+  }
+
+  .key-points span::before {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    content: "";
+    transform: translateY(-50%);
+  }
+
+  .article-prose {
+    margin-top: 28px;
+  }
+
+  .sources {
+    margin: 40px 0 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+  }
+
+  .sources h2 {
+    margin: 0 0 9px;
+    font-size: 0.9rem;
+    font-weight: 650;
+  }
+
+  .sources ol {
+    margin: 0;
+    padding-left: 18px;
+  }
+
+  .sources li {
+    margin: 6px 0;
+    color: var(--text-soft);
+    font-size: 0.72rem;
+  }
+
+  .sources a {
+    color: var(--text-soft);
+  }
+
+  .sources small {
+    display: block;
+    color: var(--muted);
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 22px;
+  }
+
+  .tag-list a {
+    padding: 3px 9px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--muted);
+    font-size: 0.66rem;
+    text-decoration: none;
+  }
+
+  .article-sidebar {
+    display: grid;
+    align-content: start;
+    gap: 18px;
+  }
+
+  .progress-motif {
+    display: grid;
+    place-items: center;
+    min-height: 160px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .progress-motif span,
+  .progress-motif small {
+    color: var(--muted);
+    font-size: 0.66rem;
+  }
+
+  .progress-motif div {
+    width: 112px;
+    height: 56px;
+    margin: 8px 0;
+    border: 10px solid transparent;
+    border-top-color: var(--accent);
+    border-right-color: #ff8c75;
+    border-radius: 112px 112px 0 0;
+    transform: rotate(-12deg);
+  }
+
+  @media (max-width: 1040px) {
+    .article-layout {
+      grid-template-columns: minmax(0, 720px) 220px;
+      gap: 36px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .article-page {
+      width: min(720px, calc(100% - 32px));
+      padding-top: 18px;
+    }
+
+    .article-layout {
+      display: block;
+      margin-top: 16px;
+    }
+
+    .article-sidebar {
+      display: none;
+    }
+
+    h1 {
+      font-size: 32px;
+    }
+  }
+
+  @media (max-width: 540px) {
+    h1 {
+      font-size: 29px;
+    }
+
+    .description {
+      font-size: 0.88rem;
+    }
+
+    .author-meta span {
+      display: block;
+      line-height: 1.5;
+    }
+  }
+</style>

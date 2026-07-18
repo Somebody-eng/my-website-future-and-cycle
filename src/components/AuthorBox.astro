@@ -1,0 +1,58 @@
+---
+import { ArrowRight } from "@lucide/astro";
+import { editorProfile } from "@lib/people";
+interface Props { author: string; }
+const { author } = Astro.props;
+---
+
+<section class="author-box">
+  <img src={editorProfile.image} alt={editorProfile.imageAlt} />
+  <div>
+    <h2>{author}</h2>
+    <p>专注商业思想、企业案例和长期主义方法论，在变化中寻找不变的东西。</p>
+    <a href="/about/">查看作者介绍 <ArrowRight size={14} stroke-width={1.5} aria-hidden="true" /></a>
+  </div>
+</section>
+
+<style>
+  .author-box {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  img {
+    flex: 0 0 auto;
+    width: 54px;
+    height: 54px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  h2 {
+    margin: 0 0 2px;
+    font-size: 0.88rem;
+    font-weight: 650;
+  }
+
+  p {
+    margin: 0 0 3px;
+    color: var(--muted);
+    font-size: 0.72rem;
+    line-height: 1.55;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-soft);
+    font-size: 0.68rem;
+    text-decoration: none;
+  }
+</style>

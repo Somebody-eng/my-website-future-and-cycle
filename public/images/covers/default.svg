@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">未来与周期默认封面</title>
+  <desc id="desc">由纸张、曲线和理性商业笔记组成的抽象封面</desc>
+  <rect width="1200" height="630" fill="#fbfaf7"/>
+  <path d="M0 470c150-80 286-114 410-102 150 15 268 102 434 93 122-7 235-67 356-158v327H0z" fill="#176b87" opacity=".16"/>
+  <path d="M88 142h530v324H88z" fill="#fff" stroke="#ded9d0" stroke-width="4"/>
+  <path d="M160 226h384M160 296h310M160 366h352" stroke="#2f6f4e" stroke-width="18" stroke-linecap="round" opacity=".72"/>
+  <circle cx="833" cy="240" r="94" fill="#b7791f" opacity=".2"/>
+  <path d="M752 382c64-112 140-168 228-168 48 0 91 18 132 54" fill="none" stroke="#176b87" stroke-width="22" stroke-linecap="round"/>
+  <text x="88" y="560" fill="#202124" font-family="Georgia, serif" font-size="54" font-weight="700">未来与周期</text>
+</svg>

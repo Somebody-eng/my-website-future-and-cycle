@@ -1,0 +1,45 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import ArticleCard from "@components/ArticleCard.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
+import { getAllTags, getPublishedPosts } from "@lib/posts";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return getAllTags(posts).map((tag) => ({ params: { tag } }));
+}
+
+const tag = Astro.params.tag || "";
+const posts = (await getPublishedPosts()).filter((post) => post.data.tags.includes(tag));
+const description = `与「${tag}」相关的长期主义商业思想文章。`;
+---
+
+<BaseLayout title={`${tag}标签`} description={description} canonical={`/tags/${encodeURIComponent(tag)}/`}>
+  <section class="section listing-page">
+    <div class="container">
+      <Breadcrumb items={[{ label: "标签" }, { label: tag }]} />
+      <header class="listing-header">
+        <p class="eyebrow">TOPIC INDEX · {String(posts.length).padStart(2, "0")}</p>
+        <h1>#{tag}</h1>
+        <p>{description}</p>
+      </header>
+      <div class="article-list">
+        {posts.map((post) => <ArticleCard post={post} variant="row" />)}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .listing-page { padding-top: 34px; }
+  .listing-header { max-width: 760px; margin: 42px 0 34px; }
+  .eyebrow { margin: 0 0 14px; color: var(--accent); font-size: 12px; font-weight: 700; }
+  h1 { margin: 0; font-size: 42px; line-height: 1.18; }
+  .listing-header > p:last-child { margin: 16px 0 0; color: var(--muted); font-size: 17px; line-height: 1.8; }
+  .article-list { border-top: 1px solid var(--line); }
+  @media (max-width: 640px) {
+    .listing-page { padding-top: 22px; }
+    .listing-header { margin: 30px 0 26px; }
+    h1 { font-size: 32px; }
+  }
+</style>

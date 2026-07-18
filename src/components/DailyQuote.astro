@@ -1,0 +1,124 @@
+---
+import { dailyQuotes } from "@lib/quotes";
+
+const initialQuote = dailyQuotes[0];
+---
+
+<section class="daily-quote" aria-labelledby="daily-quote-title">
+  <h2 id="daily-quote-title">每日思想</h2>
+  <blockquote id="daily-quote-text">{initialQuote.text}</blockquote>
+  <div class="quote-source">
+    <img id="daily-quote-image" src={initialQuote.portrait} alt={initialQuote.portraitAlt} />
+    <div>
+      <strong id="daily-quote-author">{initialQuote.author}</strong>
+      <a id="daily-quote-link" href={initialQuote.sourceUrl} target="_blank" rel="noopener">
+        <span id="daily-quote-source">{initialQuote.source}</span>
+      </a>
+      <small id="daily-quote-note">{initialQuote.note}</small>
+    </div>
+  </div>
+</section>
+
+<script is:inline define:vars={{ dailyQuotes }}>
+  const dayKey = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date());
+  const dayNumber = Number(dayKey.replaceAll("-", ""));
+  const quote = dailyQuotes[dayNumber % dailyQuotes.length];
+  const text = document.querySelector("#daily-quote-text");
+  const author = document.querySelector("#daily-quote-author");
+  const source = document.querySelector("#daily-quote-source");
+  const note = document.querySelector("#daily-quote-note");
+  const link = document.querySelector("#daily-quote-link");
+  const image = document.querySelector("#daily-quote-image");
+  if (text) text.textContent = quote.text;
+  if (author) author.textContent = quote.author;
+  if (source) source.textContent = quote.source;
+  if (note) note.textContent = quote.note || "";
+  if (link) link.setAttribute("href", quote.sourceUrl);
+  if (image) {
+    image.setAttribute("src", quote.portrait);
+    image.setAttribute("alt", quote.portraitAlt);
+  }
+</script>
+
+<style>
+  .daily-quote {
+    margin-top: 36px;
+  }
+
+  h2 {
+    margin: 0 0 16px;
+    font-size: 0.95rem;
+    font-weight: 650;
+  }
+
+  blockquote {
+    position: relative;
+    margin: 0 0 18px;
+    padding-left: 34px;
+    color: var(--text);
+    font-size: clamp(1rem, 1.25vw, 1.18rem);
+    line-height: 1.75;
+  }
+
+  blockquote::before {
+    position: absolute;
+    top: -8px;
+    left: 0;
+    color: var(--muted-light);
+    content: "“";
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .quote-source {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 34px;
+  }
+
+  img {
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .quote-source div {
+    display: grid;
+    gap: 2px;
+  }
+
+  strong {
+    font-size: 0.88rem;
+  }
+
+  a,
+  small {
+    color: var(--muted);
+    font-size: 0.72rem;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--accent);
+  }
+
+  @media (max-width: 720px) {
+    .daily-quote {
+      margin-top: 28px;
+    }
+
+    blockquote,
+    .quote-source {
+      padding-left: 30px;
+    }
+  }
+</style>

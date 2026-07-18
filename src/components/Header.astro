@@ -1,0 +1,280 @@
+---
+import {
+  Archive,
+  LayoutGrid,
+  House,
+  Menu,
+  Rss,
+  Search,
+  UserRound
+} from "@lucide/astro";
+import { SITE_SHORT_NAME } from "@lib/site";
+
+const path = Astro.url.pathname;
+const isHome = path === "/";
+const isTopics = path.startsWith("/categories") || path.startsWith("/tags");
+const isPeople = path.includes("idea-maps");
+---
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="wordmark" href="/">{SITE_SHORT_NAME}</a>
+    <nav class="desktop-nav" aria-label="主导航">
+      <a href="/#latest">文章</a>
+      <a href="/#topics">主题</a>
+      <a href="/#people">人物</a>
+      <a href="/about/">关于</a>
+    </nav>
+    <div class="header-actions">
+      <a class="icon-link search-link" href="/search/" aria-label="搜索文章">
+        <Search size={20} stroke-width={1.6} aria-hidden="true" />
+        <span>搜索</span>
+      </a>
+      <details class="mobile-menu">
+        <summary aria-label="打开菜单"><Menu size={23} stroke-width={1.6} aria-hidden="true" /></summary>
+        <nav aria-label="移动端菜单">
+          <a href="/#latest">文章</a>
+          <a href="/#topics">主题</a>
+          <a href="/#people">人物</a>
+          <a href="/search/">搜索</a>
+          <a href="/about/">关于</a>
+          <a href="/disclaimer/">免责声明</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+<aside class="side-rail" aria-label="快捷导航">
+  <a href="/" class:list={{ active: isHome }} aria-current={isHome ? "page" : undefined}>
+    <House size={23} stroke-width={1.45} aria-hidden="true" /><span>首页</span>
+  </a>
+  <a href="/#topics" class:list={{ active: isTopics }}>
+    <LayoutGrid size={22} stroke-width={1.45} aria-hidden="true" /><span>主题</span>
+  </a>
+  <a href="/#people" class:list={{ active: isPeople }}>
+    <UserRound size={23} stroke-width={1.45} aria-hidden="true" /><span>人物</span>
+  </a>
+  <a href="/#latest">
+    <Archive size={22} stroke-width={1.45} aria-hidden="true" /><span>归档</span>
+  </a>
+  <a href="/rss.xml">
+    <Rss size={21} stroke-width={1.45} aria-hidden="true" /><span>RSS</span>
+  </a>
+</aside>
+
+<nav class="mobile-bottom-nav" aria-label="移动端快捷导航">
+  <a href="/" class:list={{ active: isHome }} aria-current={isHome ? "page" : undefined}>
+    <House size={23} stroke-width={1.6} aria-hidden="true" /><span>首页</span>
+  </a>
+  <a href="/#topics" class:list={{ active: isTopics }}>
+    <LayoutGrid size={23} stroke-width={1.6} aria-hidden="true" /><span>主题</span>
+  </a>
+  <a href="/#people" class:list={{ active: isPeople }}>
+    <UserRound size={23} stroke-width={1.6} aria-hidden="true" /><span>人物</span>
+  </a>
+  <a href="/#latest">
+    <Archive size={23} stroke-width={1.6} aria-hidden="true" /><span>归档</span>
+  </a>
+</nav>
+
+<style>
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    margin-left: var(--rail-width);
+    border-bottom: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+  }
+
+  .topbar-inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    width: min(1280px, calc(100% - 80px));
+    min-height: var(--header-height);
+    margin: 0 auto;
+  }
+
+  .wordmark {
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 680;
+    text-decoration: none;
+  }
+
+  .desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: 52px;
+  }
+
+  .desktop-nav a,
+  .search-link {
+    color: var(--text-soft);
+    font-size: 0.82rem;
+    text-decoration: none;
+  }
+
+  .desktop-nav a:hover,
+  .search-link:hover {
+    color: var(--text);
+  }
+
+  .header-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .icon-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .mobile-menu {
+    display: none;
+    position: relative;
+  }
+
+  .mobile-menu summary {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .mobile-menu summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .mobile-menu nav {
+    position: absolute;
+    top: 48px;
+    right: 0;
+    display: grid;
+    width: 190px;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+    box-shadow: var(--shadow);
+  }
+
+  .mobile-menu nav a {
+    padding: 11px 12px;
+    color: var(--text);
+    font-size: 0.86rem;
+    text-decoration: none;
+  }
+
+  .side-rail {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 45;
+    display: flex;
+    width: var(--rail-width);
+    padding: 92px 0 24px;
+    border-right: 1px solid var(--line);
+    background: #fff;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .side-rail a,
+  .mobile-bottom-nav a {
+    position: relative;
+    display: grid;
+    place-items: center;
+    gap: 5px;
+    color: var(--text-soft);
+    font-size: 0.68rem;
+    text-decoration: none;
+  }
+
+  .side-rail a {
+    width: 64px;
+    min-height: 54px;
+  }
+
+  .side-rail a::before,
+  .mobile-bottom-nav a::after {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    content: "";
+    opacity: 0;
+  }
+
+  .side-rail a::before {
+    top: 7px;
+    left: -1px;
+  }
+
+  .side-rail a.active,
+  .mobile-bottom-nav a.active {
+    color: var(--accent);
+  }
+
+  .side-rail a.active::before,
+  .mobile-bottom-nav a.active::after {
+    opacity: 1;
+  }
+
+  .mobile-bottom-nav {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
+    .topbar {
+      margin-left: 0;
+    }
+
+    .topbar-inner {
+      grid-template-columns: 1fr auto;
+      width: calc(100% - 32px);
+    }
+
+    .desktop-nav,
+    .side-rail,
+    .search-link span {
+      display: none;
+    }
+
+    .header-actions {
+      gap: 2px;
+    }
+
+    .mobile-menu {
+      display: block;
+    }
+
+    .mobile-bottom-nav {
+      position: fixed;
+      inset: auto 0 0;
+      z-index: 50;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      height: calc(70px + env(safe-area-inset-bottom));
+      padding: 8px 8px env(safe-area-inset-bottom);
+      border-top: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(14px);
+    }
+
+    .mobile-bottom-nav a::after {
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+</style>

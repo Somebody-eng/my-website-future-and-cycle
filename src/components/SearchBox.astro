@@ -1,0 +1,59 @@
+---
+import { Search } from "@lucide/astro";
+---
+
+<label class="search-box">
+  <Search size={19} stroke-width={1.8} aria-hidden="true" />
+  <span class="sr-only">搜索文章</span>
+  <input id="site-search" type="search" placeholder="输入关键词、栏目或标签" autocomplete="off" />
+  <kbd>⌘ K</kbd>
+</label>
+
+<script>
+  const input = document.querySelector<HTMLInputElement>("#site-search");
+  document.addEventListener("keydown", (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+      event.preventDefault();
+      input?.focus();
+    }
+  });
+</script>
+
+<style>
+  .search-box {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+    min-height: 56px;
+    padding: 0 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--muted);
+  }
+
+  input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+  }
+
+  input::placeholder { color: var(--muted); }
+
+  kbd {
+    padding: 3px 7px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--muted);
+    font: 12px/1.4 var(--font-sans);
+  }
+
+  @media (max-width: 640px) {
+    kbd { display: none; }
+  }
+</style>

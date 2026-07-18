@@ -1,0 +1,36 @@
+---
+interface Props {
+  slot: string;
+  label?: string;
+}
+
+const { slot, label = "广告" } = Astro.props;
+const enabled = import.meta.env.PUBLIC_ADSENSE_ENABLED === "true" && Boolean(import.meta.env.PUBLIC_ADSENSE_CLIENT);
+---
+
+{enabled && (
+  <div class="ad-slot" aria-label={label}>
+    <ins
+      class="adsbygoogle"
+      style="display:block"
+      data-ad-client={import.meta.env.PUBLIC_ADSENSE_CLIENT}
+      data-ad-slot={slot}
+      data-ad-format="auto"
+      data-full-width-responsive="true"
+    ></ins>
+    <script is:inline>
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+)}
+
+{enabled && (
+  <script is:inline async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${import.meta.env.PUBLIC_ADSENSE_CLIENT}`} crossorigin="anonymous"></script>
+)}
+
+<style>
+  .ad-slot {
+    margin: 28px 0;
+    min-height: 90px;
+  }
+</style>

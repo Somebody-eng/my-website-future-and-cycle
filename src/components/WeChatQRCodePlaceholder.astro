@@ -1,0 +1,39 @@
+<section class="wechat">
+  <div class="qr" aria-hidden="true">码</div>
+  <div>
+    <h2>微信公众号</h2>
+    <p>预留二维码位置。验证期可先不展示真实二维码，避免额外运营依赖。</p>
+  </div>
+</section>
+
+<style>
+  .wechat {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  .qr {
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    border: 1px dashed var(--line);
+    color: var(--muted);
+  }
+
+  h2 {
+    margin: 0 0 6px;
+    font-size: 1.1rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.94rem;
+  }
+</style>

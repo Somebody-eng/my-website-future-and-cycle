@@ -1,0 +1,28 @@
+---
+import type { CollectionEntry } from "astro:content";
+import ArticleCard from "@components/ArticleCard.astro";
+
+interface Props { posts: CollectionEntry<"posts">[]; }
+const { posts } = Astro.props;
+---
+
+{posts.length > 0 && (
+  <section class="related">
+    <h2>相关文章</h2>
+    <div>
+      {posts.map((post) => <ArticleCard post={post} variant="row" />)}
+    </div>
+  </section>
+)}
+
+<style>
+  .related {
+    margin-top: 34px;
+  }
+
+  h2 {
+    margin: 0 0 8px;
+    font-size: 0.9rem;
+    font-weight: 650;
+  }
+</style>

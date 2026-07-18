@@ -1,0 +1,30 @@
+---
+import { Info } from "@lucide/astro";
+import { DEFAULT_DISCLAIMER } from "@lib/site";
+interface Props { text?: string; }
+const { text = DEFAULT_DISCLAIMER } = Astro.props;
+---
+
+<aside class="disclaimer" role="note">
+  <Info size={15} stroke-width={1.5} aria-hidden="true" />
+  <span>{text}</span>
+</aside>
+
+<style>
+  .disclaimer {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    color: var(--muted);
+    font-size: 0.74rem;
+    line-height: 1.6;
+  }
+
+  svg {
+    flex: 0 0 auto;
+    margin-top: 2px;
+  }
+</style>

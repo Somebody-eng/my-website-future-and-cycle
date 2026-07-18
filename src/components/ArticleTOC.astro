@@ -1,0 +1,207 @@
+---
+import { ChevronDown } from "@lucide/astro";
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+  mode?: "desktop" | "mobile";
+}
+
+const { headings, mode = "desktop" } = Astro.props;
+const visibleHeadings = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+---
+
+{visibleHeadings.length > 0 && mode === "desktop" && (
+  <nav class="toc desktop-toc" aria-label="本文目录">
+    <strong>本文目录</strong>
+    <ol>
+      {visibleHeadings.map((heading, index) => (
+        <li class={`depth-${heading.depth}`}>
+          <a class:list={{ active: index === 0 }} href={`#${heading.slug}`}>{heading.text}</a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}
+
+{visibleHeadings.length > 0 && mode === "mobile" && (
+  <details class="toc mobile-toc" open>
+    <summary>
+      <strong>本文目录</strong>
+      <span>收起 <ChevronDown size={16} stroke-width={1.5} aria-hidden="true" /></span>
+    </summary>
+    <ol>
+      {visibleHeadings.map((heading, index) => (
+        <li class={`depth-${heading.depth}`}>
+          <a class:list={{ active: index === 0 }} href={`#${heading.slug}`}>
+            <span>{index + 1}</span>{heading.text}
+          </a>
+        </li>
+      ))}
+    </ol>
+  </details>
+)}
+
+<script>
+  const tocLinks = [...document.querySelectorAll(".toc a[href^='#']")];
+  const sections = tocLinks
+    .map((link) => document.querySelector(link.getAttribute("href") || ""))
+    .filter((section): section is Element => section !== null);
+
+  if (sections.length && "IntersectionObserver" in window) {
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries.find((entry) => entry.isIntersecting);
+      if (!visible) return;
+      tocLinks.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${visible.target.id}`);
+      });
+    }, { rootMargin: "-18% 0px -70% 0px" });
+    sections.forEach((section) => observer.observe(section));
+  }
+</script>
+
+<style>
+  .toc {
+    color: var(--text-soft);
+  }
+
+  .desktop-toc {
+    position: sticky;
+    top: 94px;
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  strong {
+    display: block;
+    margin-bottom: 16px;
+    font-size: 0.86rem;
+    font-weight: 650;
+  }
+
+  ol {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .desktop-toc a {
+    position: relative;
+    display: block;
+    padding: 9px 8px 9px 17px;
+    color: var(--muted);
+    font-size: 0.74rem;
+    line-height: 1.45;
+    text-decoration: none;
+  }
+
+  .desktop-toc a::before {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--line);
+    content: "";
+    transform: translateY(-50%);
+  }
+
+  .desktop-toc a.active {
+    color: var(--text);
+  }
+
+  .desktop-toc a.active::before {
+    background: var(--accent);
+    box-shadow: 0 0 0 5px #fff2ee;
+  }
+
+  li.depth-3 a {
+    padding-left: 28px;
+  }
+
+  .mobile-toc {
+    display: none;
+    overflow: hidden;
+    margin-top: 18px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .mobile-toc summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .mobile-toc summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .mobile-toc summary strong {
+    margin: 0;
+  }
+
+  .mobile-toc summary span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--muted);
+    font-size: 0.7rem;
+  }
+
+  .mobile-toc[open] summary svg {
+    transform: rotate(180deg);
+  }
+
+  .mobile-toc ol {
+    border-top: 1px solid var(--line);
+  }
+
+  .mobile-toc li + li {
+    border-top: 1px solid var(--line);
+  }
+
+  .mobile-toc a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    color: var(--text-soft);
+    font-size: 0.78rem;
+    text-decoration: none;
+  }
+
+  .mobile-toc a span {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    color: var(--muted);
+    font-size: 0.65rem;
+  }
+
+  @media (max-width: 900px) {
+    .desktop-toc {
+      display: none;
+    }
+
+    .mobile-toc {
+      display: block;
+    }
+  }
+</style>

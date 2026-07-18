@@ -1,0 +1,66 @@
+---
+import { people } from "@lib/people";
+---
+
+<div class="people-map">
+  {people.map((person) => (
+    <a href={person.href} aria-label={`查看${person.name}相关文章`}>
+      <img src={person.image} alt={person.imageAlt} loading="lazy" />
+      <span><strong>{person.name}</strong><small>{person.idea}</small></span>
+    </a>
+  ))}
+</div>
+
+<style>
+  .people-map {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px 18px;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  img {
+    flex: 0 0 auto;
+    width: 46px;
+    height: 46px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  span {
+    display: grid;
+    min-width: 0;
+  }
+
+  strong,
+  small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  strong {
+    font-size: 0.83rem;
+    font-weight: 620;
+  }
+
+  small {
+    color: var(--muted);
+    font-size: 0.7rem;
+  }
+
+  @media (max-width: 900px) {
+    .people-map {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

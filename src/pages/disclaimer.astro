@@ -1,0 +1,27 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
+---
+
+<BaseLayout title="免责声明" description="未来与周期的内容边界与投资风险提示。" canonical="/disclaimer/">
+  <section class="section document-page"><article class="container narrow prose">
+    <Breadcrumb items={[{ label: "免责声明" }]} />
+    <p class="eyebrow">EDITORIAL BOUNDARY</p>
+    <h1>免责声明</h1>
+    <p class="lead">本文仅用于商业与投资教育讨论，不构成任何投资建议。</p>
+    <h2>内容用途</h2>
+    <p>本站内容用于讨论商业思想、企业案例、人物方法论和公开文本。文章中的分析、判断和案例不构成证券、基金、加密资产或其他金融产品的推荐。</p>
+    <h2>不提供个性化建议</h2>
+    <p>本站不提供买卖建议、收益承诺或个性化财务规划。历史案例不代表未来结果，任何商业与投资判断都存在不确定性。</p>
+    <h2>独立判断</h2>
+    <p>读者应独立核验信息并承担决策责任。涉及财务、法律或税务决策时，请咨询具备相应资质的专业人士。</p>
+  </article></section>
+</BaseLayout>
+
+<style>
+  .document-page { padding-top: 42px; }
+  .eyebrow { margin-top: 54px; color: var(--accent); font-size: 12px; font-weight: 700; }
+  h1 { font-size: 42px; }
+  .lead { padding: 18px 0 18px 20px; border-left: 2px solid var(--accent); color: var(--text); font-size: 20px; }
+  @media (max-width: 640px) { .eyebrow { margin-top: 36px; } h1 { font-size: 34px; } }
+</style>

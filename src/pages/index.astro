@@ -1,0 +1,480 @@
+---
+import {
+  ArrowRight,
+  BrainCircuit,
+  BriefcaseBusiness,
+  Calculator,
+  Cpu,
+  Landmark,
+  Lightbulb,
+  ChartNoAxesCombined,
+  UserRound
+} from "@lucide/astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import ArticleCard from "@components/ArticleCard.astro";
+import DailyQuote from "@components/DailyQuote.astro";
+import KnowledgeArc from "@components/KnowledgeArc.astro";
+import PeopleMap from "@components/PeopleMap.astro";
+import { categories, SITE_DESCRIPTION, SITE_NAME } from "@lib/site";
+import { getPublishedPosts } from "@lib/posts";
+
+const posts = await getPublishedPosts();
+const featured = posts.filter((post) => post.data.featured).slice(0, 4);
+const featuredPosts = featured.length >= 4 ? featured : posts.slice(0, 4);
+const latest = posts.slice(0, 6);
+
+const categoryIcons = [BriefcaseBusiness, BrainCircuit, Landmark, UserRound, Cpu, ChartNoAxesCombined, Calculator, Lightbulb];
+const topicTabs = ["全部", "巴菲特为什么", "芒格思维模型", "好生意", "AI科技", "周期与趋势"];
+---
+
+<BaseLayout title={SITE_NAME} description={SITE_DESCRIPTION}>
+  <div class="home-shell container">
+    <section class="hero-dashboard" aria-labelledby="home-title">
+      <div class="intro">
+        <h1 id="home-title">未来与周期</h1>
+        <p class="subtitle">长期主义商业思想笔记</p>
+        <p class="intro-copy">用商业常识理解企业、周期与人的长期成长。</p>
+        <DailyQuote />
+      </div>
+
+      <KnowledgeArc />
+
+      <section class="research" aria-labelledby="research-title">
+        <h2 id="research-title">本期研究</h2>
+        <div class="research-list">
+          <details open>
+            <summary>企业质量</summary>
+            <p>从现金流与护城河判断经营质量。</p>
+          </details>
+          <details>
+            <summary>理性决策</summary>
+            <p>识别偏见、概率与决策边界。</p>
+          </details>
+          <details>
+            <summary>AI 与科技</summary>
+            <p>理解技术周期与商业模式。</p>
+          </details>
+          <details>
+            <summary>普通人的长期主义</summary>
+            <p>把复利思维带入职业与副业。</p>
+          </details>
+        </div>
+      </section>
+    </section>
+
+    <nav id="topics" class="topic-tabs" aria-label="研究主题">
+      {topicTabs.map((topic, index) => (
+        <a class:list={{ active: index === 0 }} href={index === 0 ? "/#latest" : `/search/?q=${encodeURIComponent(topic)}`}>
+          {topic}
+        </a>
+      ))}
+      <a class="all-topics" href="/search/" aria-label="查看全部主题"><ArrowRight size={17} stroke-width={1.5} /></a>
+    </nav>
+
+    <section class="featured-grid" aria-label="本期重点文章">
+      {featuredPosts.map((post) => <ArticleCard post={post} variant="featured" />)}
+    </section>
+
+    <section class="home-indexes">
+      <div id="latest" class="index-panel latest-panel">
+        <div class="section-heading">
+          <h2>最新文章</h2>
+          <a href="/search/">查看全部 <ArrowRight size={15} stroke-width={1.5} /></a>
+        </div>
+        <div class="latest-list">
+          {latest.map((post) => (
+            <a href={`/posts/${post.slug}/`}>
+              <span>{post.data.title}</span>
+              <time datetime={post.data.date.toISOString()}>{post.data.date.toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" })}</time>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div id="people" class="index-panel people-panel">
+        <div class="section-heading">
+          <h2>人物思想地图</h2>
+          <a href="/categories/%E4%BA%BA%E7%89%A9%E6%80%9D%E6%83%B3%E5%9C%B0%E5%9B%BE/">查看全部 <ArrowRight size={15} stroke-width={1.5} /></a>
+        </div>
+        <PeopleMap />
+      </div>
+
+      <div class="index-panel categories-panel">
+        <div class="section-heading"><h2>八个栏目</h2></div>
+        <div class="category-index">
+          {categories.map((category, index) => {
+            const Icon = categoryIcons[index];
+            return (
+              <a href={`/categories/${encodeURIComponent(category.name)}/`}>
+                <Icon size={22} stroke-width={1.35} aria-hidden="true" />
+                <span><strong>{category.name}</strong><small>{category.description}</small></span>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .home-shell {
+    padding-top: 48px;
+  }
+
+  .hero-dashboard {
+    display: grid;
+    grid-template-columns: minmax(270px, 0.9fr) minmax(390px, 1.25fr) minmax(220px, 0.72fr);
+    gap: 44px;
+    align-items: start;
+    padding: 10px 0 46px;
+  }
+
+  .hero-dashboard > * {
+    min-width: 0;
+  }
+
+  .intro h1 {
+    margin: 0;
+    font-size: 48px;
+    font-weight: 620;
+    line-height: 1.15;
+  }
+
+  .subtitle {
+    margin: 7px 0 2px;
+    font-size: 1.15rem;
+  }
+
+  .intro-copy {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.84rem;
+  }
+
+  .research h2 {
+    margin: 0 0 22px;
+    font-size: 0.95rem;
+    font-weight: 650;
+  }
+
+  .research-list {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  details + details {
+    border-top: 1px solid var(--line);
+  }
+
+  summary {
+    position: relative;
+    padding: 16px 38px 16px 16px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary::after {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    content: "+";
+    transform: translateY(-50%);
+  }
+
+  details[open] summary::after {
+    content: "−";
+  }
+
+  details p {
+    margin: -5px 16px 15px;
+    color: var(--muted);
+    font-size: 0.72rem;
+    line-height: 1.6;
+  }
+
+  .topic-tabs {
+    display: flex;
+    align-items: center;
+    gap: 34px;
+    overflow-x: auto;
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+    scrollbar-width: none;
+  }
+
+  .topic-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .topic-tabs a {
+    position: relative;
+    flex: 0 0 auto;
+    color: var(--text-soft);
+    font-size: 0.74rem;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .topic-tabs a.active::after {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    content: "";
+    transform: translateX(-50%);
+  }
+
+  .topic-tabs .all-topics {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    margin-left: auto;
+  }
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    padding: 10px 0 42px;
+  }
+
+  .home-indexes {
+    display: grid;
+    grid-template-columns: 0.85fr 1.12fr 1.05fr;
+    border-top: 1px solid var(--line);
+  }
+
+  .index-panel {
+    min-width: 0;
+    padding: 30px 34px 40px;
+  }
+
+  .index-panel:first-child {
+    padding-left: 0;
+  }
+
+  .index-panel:last-child {
+    padding-right: 0;
+  }
+
+  .index-panel + .index-panel {
+    border-left: 1px solid var(--line);
+  }
+
+  .section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 22px;
+  }
+
+  .section-heading h2 {
+    margin: 0;
+    font-size: 0.98rem;
+    font-weight: 650;
+  }
+
+  .section-heading a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--muted);
+    font-size: 0.68rem;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .latest-list {
+    display: grid;
+  }
+
+  .latest-list a {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+    padding: 7px 0 7px 14px;
+    color: var(--text-soft);
+    font-size: 0.75rem;
+    text-decoration: none;
+  }
+
+  .latest-list a::before {
+    position: absolute;
+    left: 0;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    content: "";
+  }
+
+  .latest-list span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .latest-list time {
+    color: var(--muted);
+    font-size: 0.68rem;
+  }
+
+  .category-index {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 18px;
+  }
+
+  .category-index a {
+    display: flex;
+    gap: 10px;
+    min-width: 0;
+    color: var(--text-soft);
+    text-decoration: none;
+  }
+
+  .category-index svg {
+    flex: 0 0 auto;
+    margin-top: 2px;
+  }
+
+  .category-index span {
+    display: grid;
+    min-width: 0;
+  }
+
+  .category-index strong {
+    overflow: hidden;
+    font-size: 0.76rem;
+    font-weight: 620;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .category-index small {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 0.64rem;
+    line-height: 1.45;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+
+  @media (max-width: 1160px) {
+    .hero-dashboard {
+      grid-template-columns: 0.9fr 1.2fr;
+    }
+
+    .research {
+      grid-column: 1 / -1;
+    }
+
+    .research-list {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    details + details {
+      border-top: 0;
+      border-left: 1px solid var(--line);
+    }
+
+    .featured-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .home-indexes {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .categories-panel {
+      grid-column: 1 / -1;
+      border-top: 1px solid var(--line);
+      border-left: 0 !important;
+      padding-left: 0;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .home-shell {
+      padding-top: 30px;
+    }
+
+    .hero-dashboard {
+      grid-template-columns: 1fr;
+      gap: 42px;
+      padding: 0 0 28px;
+    }
+
+    .intro h1 {
+      font-size: 38px;
+    }
+
+    .subtitle {
+      font-size: 1.08rem;
+    }
+
+    .research {
+      grid-column: auto;
+    }
+
+    .research-list {
+      display: flex;
+      overflow-x: auto;
+    }
+
+    .research-list details {
+      flex: 0 0 175px;
+      border-top: 0;
+      border-left: 1px solid var(--line);
+    }
+
+    .research-list details:first-child {
+      border-left: 0;
+    }
+
+    .topic-tabs {
+      gap: 28px;
+    }
+
+    .featured-grid {
+      grid-template-columns: 1fr;
+      padding-bottom: 34px;
+    }
+
+    .home-indexes {
+      display: block;
+    }
+
+    .index-panel,
+    .index-panel:first-child,
+    .index-panel:last-child {
+      padding: 28px 0;
+      border-top: 1px solid var(--line);
+      border-left: 0;
+    }
+
+    .home-indexes > .index-panel:first-child {
+      border-top: 0;
+    }
+
+    .category-index {
+      gap: 14px 10px;
+    }
+  }
+</style>

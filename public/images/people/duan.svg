@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">段永平彩色头像标识</title>
+  <desc id="desc">珊瑚红背景上的段字标识，用于暂无公开授权照片时的彩色占位。</desc>
+  <rect width="160" height="160" rx="80" fill="#ff5a3c"/>
+  <circle cx="80" cy="80" r="62" fill="#ff8d76"/>
+  <text x="80" y="103" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="72" font-weight="700" fill="#ffffff">段</text>
+</svg>

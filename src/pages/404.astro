@@ -1,0 +1,28 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { ArrowLeft } from "@lucide/astro";
+---
+
+<BaseLayout title="页面未找到" description="你访问的页面不存在。" canonical="/404/">
+  <section class="not-found">
+    <div class="arc" aria-hidden="true"></div>
+    <div class="content">
+      <p>404 · LOST NOTE</p>
+      <h1>这篇笔记不在这里</h1>
+      <span>它可能已经移动，或者链接输入有误。</span>
+      <a href="/"><ArrowLeft size={17} />返回首页</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found { position: relative; display: grid; min-height: calc(100vh - 160px); place-items: center; overflow: hidden; padding: 60px 24px; text-align: center; }
+  .arc { position: absolute; bottom: -260px; width: 680px; height: 520px; border-radius: 50% 50% 0 0; background: radial-gradient(ellipse at center bottom, #fff 0 40%, #ffd7cf 41% 55%, #ff8b75 72%, #ff5a3c 100%); opacity: .8; }
+  .content { position: relative; z-index: 1; transform: translateY(-24px); }
+  .content p { color: var(--accent); font-size: 12px; font-weight: 700; }
+  h1 { margin: 14px 0; font-size: 44px; }
+  .content span { color: var(--muted); }
+  a { display: inline-flex; align-items: center; gap: 8px; margin-top: 30px; color: var(--text); font-weight: 700; text-decoration: none; }
+  a:hover { color: var(--accent); }
+  @media (max-width: 640px) { h1 { font-size: 34px; } .arc { width: 520px; } }
+</style>

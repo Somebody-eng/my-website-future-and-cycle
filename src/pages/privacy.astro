@@ -1,0 +1,29 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
+---
+
+<BaseLayout title="隐私政策" description="未来与周期的隐私政策与第三方服务说明。" canonical="/privacy/">
+  <section class="section document-page"><article class="container narrow prose">
+    <Breadcrumb items={[{ label: "隐私政策" }]} />
+    <p class="eyebrow">PRIVACY POLICY</p>
+    <h1>隐私政策</h1>
+    <p class="lead">验证期内，本站是纯静态网站，不使用数据库，也不主动收集个人身份信息。</p>
+    <h2>当前数据处理</h2>
+    <p>站内搜索在你的浏览器本地完成，不会把搜索词提交给外部搜索服务。验证期不加载广告代码，不设置广告 Cookie，也不展示广告占位。</p>
+    <h2>未来第三方服务</h2>
+    <p>后续如接入 Google Analytics、Google Search Console 或 Google AdSense，相关服务可能依据其政策处理访问数据、Cookie 或设备信息。本站会在启用前更新本页，并提供必要说明。</p>
+    <h2>联系信息</h2>
+    <p>如果你通过邮件联系本站，邮箱地址与沟通内容仅用于回复你的问题，不会出售或用于无关营销。</p>
+    <p><small>最近更新：2026 年 7 月 18 日</small></p>
+  </article></section>
+</BaseLayout>
+
+<style>
+  .document-page { padding-top: 42px; }
+  .eyebrow { margin-top: 54px; color: var(--accent); font-size: 12px; font-weight: 700; }
+  h1 { font-size: 42px; }
+  .lead { color: var(--text); font-size: 20px; }
+  small { color: var(--muted); }
+  @media (max-width: 640px) { .eyebrow { margin-top: 36px; } h1 { font-size: 34px; } }
+</style>
