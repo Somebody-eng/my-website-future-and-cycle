@@ -67,5 +67,13 @@ const gaId = import.meta.env.PUBLIC_GA_ID;
       <slot />
     </main>
     <Footer />
+    <!-- Cloudflare Web Analytics -->
+    <script
+      is:inline
+      type="module"
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token":"958eeb84aadb4874b26074a58ffe53ae"}'
+    ></script>
+    <!-- End Cloudflare Web Analytics -->
   </body>
 </html>
