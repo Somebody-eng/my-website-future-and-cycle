@@ -1,6 +1,7 @@
 ---
 import {
   ArrowRight,
+  BookOpenText,
   BrainCircuit,
   BriefcaseBusiness,
   Calculator,
@@ -22,9 +23,12 @@ const posts = await getPublishedPosts();
 const featured = posts.filter((post) => post.data.featured).slice(0, 4);
 const featuredPosts = featured.length >= 4 ? featured : posts.slice(0, 4);
 const latest = posts.slice(0, 6);
+const meetingPosts = posts
+  .filter((post) => post.data.category === "伯克希尔股东会实录")
+  .sort((a, b) => Number(a.slug.match(/\d{4}/)?.[0]) - Number(b.slug.match(/\d{4}/)?.[0]));
 
-const categoryIcons = [BriefcaseBusiness, BrainCircuit, Landmark, UserRound, Cpu, ChartNoAxesCombined, Calculator, Lightbulb];
-const topicTabs = ["全部", "巴菲特为什么", "芒格思维模型", "好生意", "AI科技", "周期与趋势"];
+const categoryIcons = [BookOpenText, BriefcaseBusiness, BrainCircuit, Landmark, UserRound, Cpu, ChartNoAxesCombined, Calculator, Lightbulb];
+const topicTabs = ["全部", "伯克希尔股东会", "巴菲特为什么", "芒格思维模型", "好生意", "AI科技", "周期与趋势"];
 ---
 
 <BaseLayout title={SITE_NAME} description={SITE_DESCRIPTION}>
@@ -60,6 +64,28 @@ const topicTabs = ["全部", "巴菲特为什么", "芒格思维模型", "好生
           </details>
         </div>
       </section>
+    </section>
+
+    <section class="meeting-series" aria-labelledby="meeting-series-title">
+      <div class="meeting-heading">
+        <div>
+          <span>BERKSHIRE MEETING ARCHIVE</span>
+          <h2 id="meeting-series-title">伯克希尔股东会实录</h2>
+        </div>
+        <a href="/categories/%E4%BC%AF%E5%85%8B%E5%B8%8C%E5%B0%94%E8%82%A1%E4%B8%9C%E4%BC%9A%E5%AE%9E%E5%BD%95/">按年份阅读 <ArrowRight size={16} stroke-width={1.5} /></a>
+      </div>
+      <div class="meeting-timeline">
+        {meetingPosts.map((post) => {
+          const year = post.slug.match(/\d{4}/)?.[0];
+          return (
+            <a href={`/posts/${post.slug}/`}>
+              <time>{year}</time>
+              <strong>{post.data.title.replace(`${year}年伯克希尔股东会实录：`, "")}</strong>
+              <small>{post.data.description}</small>
+            </a>
+          );
+        })}
+      </div>
     </section>
 
     <nav id="topics" class="topic-tabs" aria-label="研究主题">
@@ -100,7 +126,7 @@ const topicTabs = ["全部", "巴菲特为什么", "芒格思维模型", "好生
       </div>
 
       <div class="index-panel categories-panel">
-        <div class="section-heading"><h2>八个栏目</h2></div>
+        <div class="section-heading"><h2>九个栏目</h2></div>
         <div class="category-index">
           {categories.map((category, index) => {
             const Icon = categoryIcons[index];
@@ -197,6 +223,82 @@ const topicTabs = ["全部", "巴菲特为什么", "芒格思维模型", "好生
     color: var(--muted);
     font-size: 0.72rem;
     line-height: 1.6;
+  }
+
+  .meeting-series {
+    padding: 28px 0 34px;
+    border-top: 1px solid var(--line);
+  }
+
+  .meeting-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .meeting-heading span {
+    color: var(--accent);
+    font-size: 0.62rem;
+    font-weight: 700;
+  }
+
+  .meeting-heading h2 {
+    margin: 4px 0 0;
+    font-size: 1.2rem;
+    font-weight: 650;
+  }
+
+  .meeting-heading a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-soft);
+    font-size: 0.7rem;
+    text-decoration: none;
+  }
+
+  .meeting-timeline {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    border-block: 1px solid var(--line);
+  }
+
+  .meeting-timeline a {
+    display: grid;
+    min-width: 0;
+    padding: 18px 18px 20px;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .meeting-timeline a + a {
+    border-left: 1px solid var(--line);
+  }
+
+  .meeting-timeline time {
+    color: var(--accent);
+    font-size: 1.22rem;
+    font-weight: 650;
+  }
+
+  .meeting-timeline strong {
+    margin-top: 12px;
+    font-size: 0.8rem;
+    font-weight: 620;
+    line-height: 1.55;
+  }
+
+  .meeting-timeline small {
+    display: -webkit-box;
+    overflow: hidden;
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 0.64rem;
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 
   .topic-tabs {
@@ -398,6 +500,18 @@ const topicTabs = ["全部", "巴菲特为什么", "芒格思维模型", "好生
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .meeting-timeline {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .meeting-timeline a:nth-child(4) {
+      border-left: 0;
+    }
+
+    .meeting-timeline a:nth-child(n + 4) {
+      border-top: 1px solid var(--line);
+    }
+
     .home-indexes {
       grid-template-columns: 1fr 1fr;
     }
@@ -450,6 +564,29 @@ const topicTabs = ["全部", "巴菲特为什么", "芒格思维模型", "好生
 
     .topic-tabs {
       gap: 28px;
+    }
+
+    .meeting-heading {
+      align-items: center;
+    }
+
+    .meeting-timeline {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+    }
+
+    .meeting-timeline a,
+    .meeting-timeline a:nth-child(4),
+    .meeting-timeline a:nth-child(n + 4) {
+      flex: 0 0 72%;
+      border-top: 0;
+      border-left: 1px solid var(--line);
+      scroll-snap-align: start;
+    }
+
+    .meeting-timeline a:first-child {
+      border-left: 0;
     }
 
     .featured-grid {

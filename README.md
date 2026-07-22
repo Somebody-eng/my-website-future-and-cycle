@@ -27,6 +27,7 @@ npm run dev
 
 ```bash
 npm run validate:posts
+npm run validate:berkshire
 npm run publish:drafts
 npm run maintenance
 npm run seo:report
@@ -70,6 +71,7 @@ PUBLIC_GISCUS_CATEGORY_ID=
 
 一级栏目：
 
+- 伯克希尔股东会实录
 - 巴菲特为什么
 - 芒格的思维模型
 - 好生意案例库
@@ -99,6 +101,14 @@ sources:
 ```
 
 `slug` 必须使用英文小写、数字和连字符。`sources` 至少提供一个来源说明。
+
+### 伯克希尔股东会实录更新规则
+
+- 实录按年份从 1994 年开始连续发布，分类页与首页时间轴按年份升序显示。
+- 内部归档与下一篇年份配置位于 `src/data/berkshire-series.json`。
+- 新增年度文章后同步更新配置中的 `referenceArchive` 和 `nextYear`。
+- 执行 `npm run validate:berkshire`，年份跳跃、顺序错误或内部归档缺失都会导致校验失败。
+- 文章采用原创摘要和解读，不做大段复制或逐字转载；公开页面只展示官方资料入口。
 
 ## 草稿审核与发布
 

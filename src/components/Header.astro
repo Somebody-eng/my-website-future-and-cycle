@@ -1,6 +1,7 @@
 ---
 import {
   Archive,
+  BookOpenText,
   LayoutGrid,
   House,
   Menu,
@@ -12,6 +13,8 @@ import { SITE_SHORT_NAME } from "@lib/site";
 
 const path = Astro.url.pathname;
 const isHome = path === "/";
+const meetingHref = "/categories/%E4%BC%AF%E5%85%8B%E5%B8%8C%E5%B0%94%E8%82%A1%E4%B8%9C%E4%BC%9A%E5%AE%9E%E5%BD%95/";
+const isMeetings = path.includes("%E4%BC%AF%E5%85%8B%E5%B8%8C%E5%B0%94") || path.includes("伯克希尔股东会实录") || path.includes("berkshire-meeting");
 const isTopics = path.startsWith("/categories") || path.startsWith("/tags");
 const isPeople = path.includes("idea-maps");
 ---
@@ -20,6 +23,7 @@ const isPeople = path.includes("idea-maps");
   <div class="topbar-inner">
     <a class="wordmark" href="/">{SITE_SHORT_NAME}</a>
     <nav class="desktop-nav" aria-label="主导航">
+      <a href={meetingHref}>股东会实录</a>
       <a href="/#latest">文章</a>
       <a href="/#topics">主题</a>
       <a href="/#people">人物</a>
@@ -33,6 +37,7 @@ const isPeople = path.includes("idea-maps");
       <details class="mobile-menu">
         <summary aria-label="打开菜单"><Menu size={23} stroke-width={1.6} aria-hidden="true" /></summary>
         <nav aria-label="移动端菜单">
+          <a href={meetingHref}>伯克希尔股东会实录</a>
           <a href="/#latest">文章</a>
           <a href="/#topics">主题</a>
           <a href="/#people">人物</a>
@@ -48,6 +53,9 @@ const isPeople = path.includes("idea-maps");
 <aside class="side-rail" aria-label="快捷导航">
   <a href="/" class:list={{ active: isHome }} aria-current={isHome ? "page" : undefined}>
     <House size={23} stroke-width={1.45} aria-hidden="true" /><span>首页</span>
+  </a>
+  <a href={meetingHref} class:list={{ active: isMeetings }}>
+    <BookOpenText size={22} stroke-width={1.45} aria-hidden="true" /><span>实录</span>
   </a>
   <a href="/#topics" class:list={{ active: isTopics }}>
     <LayoutGrid size={22} stroke-width={1.45} aria-hidden="true" /><span>主题</span>
@@ -67,15 +75,16 @@ const isPeople = path.includes("idea-maps");
   <a href="/" class:list={{ active: isHome }} aria-current={isHome ? "page" : undefined}>
     <House size={23} stroke-width={1.6} aria-hidden="true" /><span>首页</span>
   </a>
+  <a href={meetingHref} class:list={{ active: isMeetings }}>
+    <BookOpenText size={23} stroke-width={1.6} aria-hidden="true" /><span>实录</span>
+  </a>
   <a href="/#topics" class:list={{ active: isTopics }}>
     <LayoutGrid size={23} stroke-width={1.6} aria-hidden="true" /><span>主题</span>
   </a>
   <a href="/#people" class:list={{ active: isPeople }}>
     <UserRound size={23} stroke-width={1.6} aria-hidden="true" /><span>人物</span>
   </a>
-  <a href="/#latest">
-    <Archive size={23} stroke-width={1.6} aria-hidden="true" /><span>归档</span>
-  </a>
+
 </nav>
 
 <style>
@@ -108,7 +117,7 @@ const isPeople = path.includes("idea-maps");
   .desktop-nav {
     display: flex;
     align-items: center;
-    gap: 52px;
+    gap: 38px;
   }
 
   .desktop-nav a,

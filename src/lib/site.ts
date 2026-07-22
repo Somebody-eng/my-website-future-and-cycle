@@ -9,6 +9,11 @@ export const SITE_URL = (import.meta.env.PUBLIC_SITE_URL || "https://future-cycl
 
 export const categories = [
   {
+    name: "伯克希尔股东会实录",
+    slug: "berkshire-meetings",
+    description: "按年份整理伯克希尔股东大会问答，以原创摘要呈现商业判断、资本配置与长期经营方法。"
+  },
+  {
     name: "巴菲特为什么",
     slug: "buffett-why",
     description: "用商业常识解读巴菲特重视现金流、定价权、低负债和资本配置的原因。"

@@ -12,6 +12,9 @@ export async function getStaticPaths() {
 
 const categoryName = Astro.params.category || "";
 const posts = (await getPublishedPosts()).filter((post) => post.data.category === categoryName);
+if (categoryName === "伯克希尔股东会实录") {
+  posts.sort((a, b) => Number(a.slug.match(/\d{4}/)?.[0]) - Number(b.slug.match(/\d{4}/)?.[0]));
+}
 const category = categoryByName.get(categoryName);
 const tags = [...new Set(posts.flatMap((post) => post.data.tags))];
 const description = category?.description || `${categoryName}栏目的文章聚合。`;

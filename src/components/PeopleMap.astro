@@ -5,7 +5,7 @@ import { people } from "@lib/people";
 <div class="people-map">
   {people.map((person) => (
     <a href={person.href} aria-label={`查看${person.name}相关文章`}>
-      <img src={person.image} alt={person.imageAlt} loading="lazy" />
+      <img src={person.image} alt={person.imageAlt} loading="eager" />
       <span><strong>{person.name}</strong><small>{person.idea}</small></span>
     </a>
   ))}
