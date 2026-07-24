@@ -20,6 +20,12 @@ const { post } = Astro.props;
 const { Content, headings } = await post.render();
 const allPosts = await getPublishedPosts();
 const related = getRelatedPosts(post, allPosts);
+const meetingPosts = allPosts
+  .filter((item) => item.data.category === "伯克希尔股东会实录")
+  .sort((a, b) => Number(a.slug.match(/\d{4}/)?.[0]) - Number(b.slug.match(/\d{4}/)?.[0]));
+const meetingIndex = meetingPosts.findIndex((item) => item.slug === post.slug);
+const previousMeeting = meetingIndex > 0 ? meetingPosts[meetingIndex - 1] : undefined;
+const nextMeeting = meetingIndex >= 0 && meetingIndex < meetingPosts.length - 1 ? meetingPosts[meetingIndex + 1] : undefined;
 ---
 
 <BaseLayout
@@ -61,6 +67,16 @@ const related = getRelatedPosts(post, allPosts);
         <div class="prose article-prose">
           <Content />
         </div>
+
+        {post.data.category === "伯克希尔股东会实录" && (
+          <nav class="meeting-pagination" aria-label="伯克希尔股东会实录年度导航">
+            <a class="all-years" href={categoryHref(post.data.category)}>全部年份</a>
+            <div>
+              {previousMeeting ? <a href={`/posts/${previousMeeting.slug}/`}>上一篇：{previousMeeting.data.title}</a> : <span>已是首篇</span>}
+              {nextMeeting ? <a href={`/posts/${nextMeeting.slug}/`}>下一篇：{nextMeeting.data.title}</a> : <span>已更新至 2023 年</span>}
+            </div>
+          </nav>
+        )}
 
         <AdSlot slot="article-middle" label="正文中部广告" />
 
@@ -214,6 +230,41 @@ const related = getRelatedPosts(post, allPosts);
 
   .article-prose {
     margin-top: 28px;
+  }
+
+  .meeting-pagination {
+    display: grid;
+    gap: 12px;
+    margin: 42px 0 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+  }
+
+  .meeting-pagination a {
+    color: var(--text-soft);
+    font-size: 0.76rem;
+    text-decoration: none;
+  }
+
+  .meeting-pagination .all-years {
+    color: var(--accent);
+    font-weight: 650;
+  }
+
+  .meeting-pagination div {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .meeting-pagination div > :last-child {
+    margin-left: auto;
+    text-align: right;
+  }
+
+  .meeting-pagination span {
+    color: var(--muted);
+    font-size: 0.72rem;
   }
 
   .sources {

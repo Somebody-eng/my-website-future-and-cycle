@@ -100,15 +100,22 @@ disclaimer:
 sources:
 ```
 
-`slug` 必须使用英文小写、数字和连字符。`sources` 至少提供一个来源说明。
+`slug` 必须使用英文小写、数字和连字符。普通文章的 `sources` 至少提供一个来源说明；已获授权且不要求公开署名的资料可以保留空数组，授权记录应在站外妥善保存。
 
 ### 伯克希尔股东会实录更新规则
 
-- 实录按年份从 1994 年开始连续发布，分类页与首页时间轴按年份升序显示。
-- 内部归档与下一篇年份配置位于 `src/data/berkshire-series.json`。
-- 新增年度文章后同步更新配置中的 `referenceArchive` 和 `nextYear`。
-- 执行 `npm run validate:berkshire`，年份跳跃、顺序错误或内部归档缺失都会导致校验失败。
-- 文章采用原创摘要和解读，不做大段复制或逐字转载；公开页面只展示官方资料入口。
+- 当前实录覆盖 1994-2023 年，分类页按年份升序显示，首页只展示最近五年。
+- 年份范围与下一篇年份配置位于 `src/data/berkshire-series.json`。
+- 两册经授权 PDF 可通过导入脚本按目录分段、按年份归并：
+
+```bash
+python scripts/import-berkshire-pdfs.py "上册.pdf" "下册.pdf"
+```
+
+- 导入只清理重复页码、页眉、宣传文字、账号链接和排版噪声，不改写会议问答。
+- 导入脚本需要 Python 3 与 `pypdf`，PDF 文件不提交到公开仓库。
+- 执行 `npm run validate:berkshire`，年份跳跃、顺序错误或未达到配置中的最后年份都会导致校验失败。
+- 新增下一年度后同步更新 `lastImportedYear` 和 `nextYear`。
 
 ## 草稿审核与发布
 

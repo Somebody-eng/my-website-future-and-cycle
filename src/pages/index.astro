@@ -26,6 +26,7 @@ const latest = posts.slice(0, 6);
 const meetingPosts = posts
   .filter((post) => post.data.category === "伯克希尔股东会实录")
   .sort((a, b) => Number(a.slug.match(/\d{4}/)?.[0]) - Number(b.slug.match(/\d{4}/)?.[0]));
+const meetingPreviewPosts = meetingPosts.slice(-5);
 
 const categoryIcons = [BookOpenText, BriefcaseBusiness, BrainCircuit, Landmark, UserRound, Cpu, ChartNoAxesCombined, Calculator, Lightbulb];
 const topicTabs = ["全部", "伯克希尔股东会", "巴菲特为什么", "芒格思维模型", "好生意", "AI科技", "周期与趋势"];
@@ -75,7 +76,7 @@ const topicTabs = ["全部", "伯克希尔股东会", "巴菲特为什么", "芒
         <a href="/categories/%E4%BC%AF%E5%85%8B%E5%B8%8C%E5%B0%94%E8%82%A1%E4%B8%9C%E4%BC%9A%E5%AE%9E%E5%BD%95/">按年份阅读 <ArrowRight size={16} stroke-width={1.5} /></a>
       </div>
       <div class="meeting-timeline">
-        {meetingPosts.map((post) => {
+        {meetingPreviewPosts.map((post) => {
           const year = post.slug.match(/\d{4}/)?.[0];
           return (
             <a href={`/posts/${post.slug}/`}>

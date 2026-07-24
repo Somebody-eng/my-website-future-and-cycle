@@ -1,15 +1,9 @@
 {
   "category": "伯克希尔股东会实录",
   "firstYear": 1994,
+  "lastImportedYear": 2023,
+  "nextYear": 2024,
   "order": "ascending",
-  "requiredSourceUrlPrefix": "https://xueqiu.com/6997043160/",
-  "referenceArchive": {
-    "1994": "https://xueqiu.com/6997043160/122007508",
-    "1995": "https://xueqiu.com/6997043160/123070879",
-    "1996": "https://xueqiu.com/6997043160/128335565",
-    "1997": "https://xueqiu.com/6997043160/137067300",
-    "1998": "https://xueqiu.com/6997043160/133228667"
-  },
-  "editorialMode": "基于固定资料归档进行原创摘要和解读，不做大段复制或逐字转载",
-  "nextYear": 1999
+  "sourceMode": "user-supplied licensed PDF archive",
+  "editorialMode": "按年份收录股东大会问答实录全文，仅清理重复页眉、宣传文字与排版噪声"
 }

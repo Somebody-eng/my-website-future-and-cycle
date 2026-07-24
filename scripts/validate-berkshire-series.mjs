@@ -15,14 +15,14 @@ for (const [index, post] of posts.entries()) {
   const expectedYear = config.firstYear + index;
   if (!Number.isInteger(post.year)) issues.push(`${post.path} 的 slug 缺少四位年份。`);
   if (post.year !== expectedYear) issues.push(`年份必须连续：期望 ${expectedYear}，实际 ${post.year}。`);
-  const archiveUrl = config.referenceArchive?.[post.year];
-  if (!archiveUrl?.startsWith(config.requiredSourceUrlPrefix)) {
-    issues.push(`${post.year} 年缺少内部资料归档地址。`);
-  }
+
 }
 
 const nextYear = posts.length ? posts.at(-1).year + 1 : config.firstYear;
 if (nextYear !== config.nextYear) issues.push(`配置中的 nextYear 应为 ${nextYear}，当前为 ${config.nextYear}。`);
+if (posts.at(-1)?.year !== config.lastImportedYear) {
+  issues.push(`最后导入年份应为 ${config.lastImportedYear}，当前为 ${posts.at(-1)?.year || "无"}。`);
+}
 
 await ensureDir("reports");
 const lines = [

@@ -2,7 +2,7 @@ import { getCollection, type CollectionEntry } from "astro:content";
 
 export async function getPublishedPosts() {
   const posts = await getCollection("posts");
-  return posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+  return posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf() || b.slug.localeCompare(a.slug, "en"));
 }
 
 export function getAllTags(posts: CollectionEntry<"posts">[]) {

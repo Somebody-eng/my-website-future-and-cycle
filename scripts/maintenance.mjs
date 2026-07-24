@@ -48,7 +48,10 @@ lines.push(missingAlt.length ? missingAlt.map((post) => `- ${post.data.title}`).
 lines.push("");
 
 lines.push("## 内部链接数量不足");
-const lowInternalLinks = posts.filter((post) => internalLinks(post.content).length < 2);
+const lowInternalLinks = posts.filter((post) => {
+  const templateLinks = post.data.category === "伯克希尔股东会实录" ? 2 : 0;
+  return internalLinks(post.content).length + templateLinks < 2;
+});
 lines.push(lowInternalLinks.length ? lowInternalLinks.map((post) => `- ${post.data.title}`).join("\n") : "- 未发现");
 lines.push("");
 
