@@ -2,6 +2,7 @@
 import BaseLayout from "@layouts/BaseLayout.astro";
 import AdSlot from "@components/AdSlot.astro";
 import ArticleTOC from "@components/ArticleTOC.astro";
+import ArticleShare from "@components/ArticleShare.astro";
 import AuthorBox from "@components/AuthorBox.astro";
 import Breadcrumb from "@components/Breadcrumb.astro";
 import Comments from "@components/Comments.astro";
@@ -58,6 +59,7 @@ const nextMeeting = meetingIndex >= 0 && meetingIndex < meetingPosts.length - 1 
 
         <Disclaimer text={post.data.disclaimer} />
         <ReadingControls />
+        <ArticleShare title={post.data.title} description={post.data.description} slug={post.slug} />
         <ArticleTOC headings={headings} mode="mobile" />
         <AdSlot slot="article-top" label="文章顶部广告" />
 

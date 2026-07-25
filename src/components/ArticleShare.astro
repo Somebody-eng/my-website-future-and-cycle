@@ -1,0 +1,415 @@
+---
+import QRCode from "qrcode";
+import { Copy, Download, ExternalLink, Link2, MessageCircle, Ellipsis, Radio, Share2, Smartphone, X } from "@lucide/astro";
+
+interface Props {
+  title: string;
+  description: string;
+  slug: string;
+}
+
+const { title, description, slug } = Astro.props;
+const siteBase = Astro.site?.href.endsWith("/") ? Astro.site.href : `${Astro.site?.href ?? Astro.url.origin}/`;
+const articleUrl = new URL(`posts/${slug}/`, siteBase).href;
+const wechatUrl = new URL(articleUrl);
+wechatUrl.searchParams.set("utm_source", "wechat");
+wechatUrl.searchParams.set("utm_medium", "social");
+wechatUrl.searchParams.set("utm_campaign", "article_share");
+const qrCode = await QRCode.toDataURL(wechatUrl.href, {
+  width: 280,
+  margin: 1,
+  color: { dark: "#171717", light: "#ffffff" },
+  errorCorrectionLevel: "M"
+});
+
+const mainlandPlatforms = [
+  { id: "weibo", label: "新浪微博", mark: "微", color: "#e94b35" },
+  { id: "qq", label: "QQ", mark: "Q", color: "#1687d9" },
+  { id: "qzone", label: "QQ 空间", mark: "空", color: "#f0a500" },
+  { id: "douban", label: "豆瓣", mark: "豆", color: "#258c45" }
+];
+
+const globalPlatforms = [
+  { id: "x", label: "X / Twitter", mark: "X", color: "#171717" },
+  { id: "facebook", label: "Facebook", mark: "f", color: "#1877f2" },
+  { id: "linkedin", label: "LinkedIn", mark: "in", color: "#0a66c2" },
+  { id: "telegram", label: "Telegram", mark: "T", color: "#229ed9" },
+  { id: "whatsapp", label: "WhatsApp", mark: "W", color: "#21a366" },
+  { id: "reddit", label: "Reddit", mark: "r", color: "#ff4500" },
+  { id: "line", label: "LINE", mark: "L", color: "#06c755" },
+  { id: "discord", label: "Discord", mark: "D", color: "#5865f2" }
+];
+---
+
+<section
+  class="article-share"
+  data-article-share
+  data-title={title}
+  data-description={description}
+  data-url={articleUrl}
+  aria-label="分享文章"
+>
+  <div class="share-bar">
+    <div class="share-bar__label">
+      <Share2 size={17} stroke-width={1.7} aria-hidden="true" />
+      <span>分享文章</span>
+    </div>
+    <div class="share-bar__actions">
+      <button type="button" data-share-native aria-label="使用系统分享" title="使用系统分享">
+        <Smartphone size={17} stroke-width={1.7} aria-hidden="true" /><span>系统分享</span>
+      </button>
+      <button type="button" data-open-share="wechat" aria-label="分享到微信" title="分享到微信">
+        <MessageCircle size={17} stroke-width={1.7} aria-hidden="true" /><span>微信</span>
+      </button>
+      <button type="button" data-share-platform="weibo" data-share-scope="article" aria-label="分享到新浪微博" title="分享到新浪微博">
+        <Radio size={17} stroke-width={1.7} aria-hidden="true" /><span>微博</span>
+      </button>
+      <button type="button" data-copy-link aria-label="复制文章链接" title="复制文章链接">
+        <Link2 size={17} stroke-width={1.7} aria-hidden="true" /><span>复制链接</span>
+      </button>
+      <button type="button" data-open-share="all" aria-label="更多分享方式" title="更多分享方式">
+        <Ellipsis size={18} stroke-width={1.8} aria-hidden="true" /><span>更多</span>
+      </button>
+    </div>
+  </div>
+  <p class="share-tip">选中正文中的一段话，也可以带出处分享。</p>
+
+  <div class="selection-share" data-selection-share hidden role="toolbar" aria-label="分享选中文字">
+    <button type="button" data-selection-copy aria-label="复制带出处的段落" title="复制带出处的段落"><Copy size={16} stroke-width={1.8} /></button>
+    <button type="button" data-selection-weibo aria-label="将这段话分享到微博" title="分享到微博"><Radio size={16} stroke-width={1.8} /></button>
+    <button type="button" data-selection-more aria-label="更多段落分享方式" title="更多分享方式"><Share2 size={16} stroke-width={1.8} /></button>
+  </div>
+
+  <dialog class="share-dialog" data-share-dialog aria-labelledby="share-dialog-title">
+    <div class="dialog-shell">
+      <header class="dialog-header">
+        <div><h2 id="share-dialog-title">分享给更多人</h2><p data-share-context>分享整篇文章</p></div>
+        <button type="button" class="close-button" data-close-share aria-label="关闭分享窗口" title="关闭"><X size={19} stroke-width={1.7} /></button>
+      </header>
+
+      <div class="dialog-grid">
+        <div class="platforms">
+          <section aria-labelledby="mainland-share-title">
+            <h3 id="mainland-share-title">中国大陆平台</h3>
+            <div class="platform-grid">
+              {mainlandPlatforms.map((platform) => (
+                <button type="button" data-share-platform={platform.id}>
+                  <span class="platform-mark" style={`--platform-color:${platform.color}`}>{platform.mark}</span><span>{platform.label}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+          <section aria-labelledby="global-share-title">
+            <h3 id="global-share-title">国际平台</h3>
+            <div class="platform-grid">
+              {globalPlatforms.map((platform) => (
+                <button type="button" data-share-platform={platform.id}>
+                  <span class="platform-mark" style={`--platform-color:${platform.color}`}>{platform.mark}</span><span>{platform.label}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+          <div class="share-utilities">
+            <button type="button" data-copy-text><Copy size={16} stroke-width={1.7} />复制带出处文案</button>
+            <button type="button" data-share-card><Smartphone size={16} stroke-width={1.7} />系统分享卡片</button>
+            <button type="button" data-download-card><Download size={16} stroke-width={1.7} />下载分享卡片</button>
+          </div>
+          <p class="platform-note">小红书、抖音、Instagram 等平台可使用“系统分享卡片”或下载后发布。</p>
+        </div>
+
+        <aside class="brand-card" tabindex="-1" aria-label="未来与周期分享卡片预览">
+          <div class="brand-card__brand"><span>未来与周期</span><small>长期主义商业思想笔记</small></div>
+          <blockquote data-card-copy>{title}</blockquote>
+          <div class="brand-card__source">
+            <div><span>扫码阅读全文</span><strong>future-cycle.pages.dev</strong></div>
+            <img src={qrCode} alt="扫描二维码阅读本文" width="112" height="112" />
+          </div>
+        </aside>
+      </div>
+
+      <footer class="dialog-footer">
+        <p>所有分享都会保留文章出处与原文链接。</p>
+        <a href={articleUrl} target="_blank" rel="noopener noreferrer">查看原文<ExternalLink size={14} stroke-width={1.7} /></a>
+      </footer>
+    </div>
+  </dialog>
+  <output class="share-toast" data-share-toast aria-live="polite" hidden></output>
+</section>
+
+<script>
+  const truncateShareText = (value: string, limit: number) => {
+    const normalized = value.replace(/\s+/g, " ").trim();
+    return normalized.length > limit ? `${normalized.slice(0, limit - 1)}…` : normalized;
+  };
+
+  document.querySelectorAll<HTMLElement>("[data-article-share]").forEach((root) => {
+    const title = root.dataset.title || document.title;
+    const description = root.dataset.description || "";
+    const articleUrl = root.dataset.url || window.location.href;
+    const qrCode = root.querySelector<HTMLImageElement>(".brand-card__source img")?.src || "";
+    const dialog = root.querySelector<HTMLDialogElement>("[data-share-dialog]");
+    const selectionBar = root.querySelector<HTMLElement>("[data-selection-share]");
+    const contextLabel = root.querySelector<HTMLElement>("[data-share-context]");
+    const cardCopy = root.querySelector<HTMLElement>("[data-card-copy]");
+    const toast = root.querySelector<HTMLOutputElement>("[data-share-toast]");
+    if (!dialog || !selectionBar || !contextLabel || !cardCopy || !toast) return;
+
+    let selectedQuote = "";
+    let toastTimer = 0;
+
+    const trackedUrl = (source: string, quote = false) => {
+      const url = new URL(articleUrl);
+      url.searchParams.set("utm_source", source);
+      url.searchParams.set("utm_medium", "social");
+      url.searchParams.set("utm_campaign", "article_share");
+      url.searchParams.set("utm_content", quote ? "quote" : "article");
+      return url.href;
+    };
+
+    const shareText = (source = "copy") => {
+      const url = trackedUrl(source, Boolean(selectedQuote));
+      if (selectedQuote) return `“${truncateShareText(selectedQuote, 260)}”\n\n——《${title}》｜未来与周期\n${url}`;
+      return `《${title}》\n${description}\n\n来自「未来与周期｜长期主义商业思想笔记」\n${url}`;
+    };
+
+    const showToast = (message: string) => {
+      window.clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.hidden = false;
+      toastTimer = window.setTimeout(() => { toast.hidden = true; }, 2200);
+    };
+
+    const copyText = async (value: string) => {
+      try {
+        await navigator.clipboard.writeText(value);
+      } catch {
+        const textarea = document.createElement("textarea");
+        textarea.value = value;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.append(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+      }
+    };
+
+    const updateContext = () => {
+      contextLabel.textContent = selectedQuote ? "分享选中的段落，并保留原文出处" : "分享整篇文章";
+      cardCopy.textContent = selectedQuote ? `“${truncateShareText(selectedQuote, 150)}”` : title;
+    };
+
+    const openDialog = (focusWechat = false) => {
+      updateContext();
+      dialog.showModal();
+      if (focusWechat) dialog.querySelector<HTMLElement>(".brand-card")?.focus();
+    };
+
+    const platformUrl = (platform: string) => {
+      const url = trackedUrl(platform, Boolean(selectedQuote));
+      const text = selectedQuote ? `“${truncateShareText(selectedQuote, 180)}” ——《${title}》｜未来与周期` : `《${title}》｜未来与周期`;
+      const u = encodeURIComponent(url);
+      const t = encodeURIComponent(text);
+      const heading = encodeURIComponent(title);
+      const summary = encodeURIComponent(selectedQuote ? truncateShareText(selectedQuote, 180) : description);
+      const urls: Record<string, string> = {
+        weibo: `https://service.weibo.com/share/share.php?url=${u}&title=${t}`,
+        qq: `https://connect.qq.com/widget/shareqq/index.html?url=${u}&title=${heading}&summary=${summary}`,
+        qzone: `https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=${u}&title=${heading}&summary=${summary}`,
+        douban: `https://www.douban.com/share/service?href=${u}&name=${heading}&text=${summary}`,
+        x: `https://twitter.com/intent/tweet?text=${t}&url=${u}`,
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${u}`,
+        linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${u}`,
+        telegram: `https://t.me/share/url?url=${u}&text=${t}`,
+        whatsapp: `https://wa.me/?text=${encodeURIComponent(`${text}\n${url}`)}`,
+        reddit: `https://www.reddit.com/submit?url=${u}&title=${heading}`,
+        line: `https://social-plugins.line.me/lineit/share?url=${u}`
+      };
+      return urls[platform];
+    };
+
+    const shareToPlatform = async (platform: string) => {
+      if (platform === "discord") {
+        const target = window.open("https://discord.com/channels/@me", "_blank", "noopener,noreferrer");
+        await copyText(shareText("discord"));
+        showToast(target ? "文案已复制，请粘贴到 Discord" : "Discord 分享文案已复制");
+        return;
+      }
+      const url = platformUrl(platform);
+      if (url) window.open(url, "_blank", "noopener,noreferrer,width=720,height=620");
+    };
+
+    const drawWrappedText = (context: CanvasRenderingContext2D, value: string, x: number, y: number, maxWidth: number, lineHeight: number, maxLines: number) => {
+      const characters = Array.from(value);
+      const lines: string[] = [];
+      let line = "";
+      for (const character of characters) {
+        const test = line + character;
+        if (context.measureText(test).width > maxWidth && line) {
+          lines.push(line);
+          line = character;
+          if (lines.length === maxLines) break;
+        } else line = test;
+      }
+      if (lines.length < maxLines && line) lines.push(line);
+      if (lines.join("").length < characters.length && lines.length) lines[lines.length - 1] = `${lines[lines.length - 1].slice(0, -1)}…`;
+      lines.forEach((item, index) => context.fillText(item, x, y + index * lineHeight));
+      return y + lines.length * lineHeight;
+    };
+
+    const createCardFile = async () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1080;
+      canvas.height = 1350;
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("Canvas unavailable");
+      context.fillStyle = "#fff";
+      context.fillRect(0, 0, 1080, 1350);
+      context.fillStyle = "#ff5a3c";
+      context.fillRect(0, 0, 1080, 14);
+      context.fillStyle = "#171717";
+      context.font = '600 44px "PingFang SC", "Microsoft YaHei", sans-serif';
+      context.fillText("未来与周期", 82, 112);
+      context.fillStyle = "#777773";
+      context.font = '28px "PingFang SC", "Microsoft YaHei", sans-serif';
+      context.fillText("长期主义商业思想笔记", 82, 158);
+      context.fillStyle = "#171717";
+      context.font = selectedQuote ? '500 52px "PingFang SC", "Microsoft YaHei", sans-serif' : '600 58px "PingFang SC", "Microsoft YaHei", sans-serif';
+      const cardText = selectedQuote ? `“${truncateShareText(selectedQuote, 240)}”` : title;
+      const bottom = drawWrappedText(context, cardText, 82, 310, 916, selectedQuote ? 82 : 90, selectedQuote ? 8 : 6);
+      context.fillStyle = "#777773";
+      context.font = '28px "PingFang SC", "Microsoft YaHei", sans-serif';
+      drawWrappedText(context, selectedQuote ? `——《${title}》` : description, 82, Math.min(bottom + 70, 940), 760, 46, 3);
+      context.strokeStyle = "#e4e4e1";
+      context.lineWidth = 2;
+      context.beginPath(); context.moveTo(82, 1080); context.lineTo(998, 1080); context.stroke();
+      context.fillStyle = "#171717";
+      context.font = '600 30px "PingFang SC", "Microsoft YaHei", sans-serif';
+      context.fillText("扫码阅读全文", 82, 1160);
+      context.fillStyle = "#777773";
+      context.font = "25px Inter, sans-serif";
+      context.fillText("future-cycle.pages.dev", 82, 1205);
+      const image = new Image(); image.src = qrCode; await image.decode(); context.drawImage(image, 806, 1110, 192, 192);
+      const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob((value) => value ? resolve(value) : reject(new Error("Card export failed")), "image/png"));
+      return new File([blob], `${title.slice(0, 24)}-未来与周期.png`, { type: "image/png" });
+    };
+
+    const downloadCard = async () => {
+      const file = await createCardFile();
+      const url = URL.createObjectURL(file);
+      const anchor = document.createElement("a"); anchor.href = url; anchor.download = file.name; anchor.click();
+      URL.revokeObjectURL(url); showToast("分享卡片已生成");
+    };
+
+    const nativeShare = async (withCard = false) => {
+      try {
+        if (withCard) {
+          const file = await createCardFile();
+          if (navigator.canShare?.({ files: [file] })) {
+            await navigator.share({ title, text: shareText("native_card"), files: [file] }); return;
+          }
+          await downloadCard(); return;
+        }
+        if (navigator.share) await navigator.share({ title: `${title}｜未来与周期`, text: shareText("native"), url: trackedUrl("native", Boolean(selectedQuote)) });
+        else { await copyText(shareText("copy")); showToast("分享文案已复制"); }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        showToast("暂时无法调用系统分享，请使用复制文案");
+      }
+    };
+
+    root.querySelectorAll<HTMLButtonElement>("[data-open-share]").forEach((button) => button.addEventListener("click", () => { selectedQuote = ""; openDialog(button.dataset.openShare === "wechat"); }));
+    root.querySelectorAll<HTMLButtonElement>("[data-share-platform]").forEach((button) => button.addEventListener("click", () => { if (button.dataset.shareScope === "article") selectedQuote = ""; shareToPlatform(button.dataset.sharePlatform || ""); }));
+    root.querySelector<HTMLButtonElement>("[data-copy-link]")?.addEventListener("click", async () => { await copyText(trackedUrl("copy_link")); showToast("文章链接已复制"); });
+    root.querySelector<HTMLButtonElement>("[data-share-native]")?.addEventListener("click", () => { selectedQuote = ""; nativeShare(false); });
+    root.querySelector<HTMLButtonElement>("[data-copy-text]")?.addEventListener("click", async () => { await copyText(shareText("copy")); showToast("带出处的分享文案已复制"); });
+    root.querySelector<HTMLButtonElement>("[data-share-card]")?.addEventListener("click", () => nativeShare(true));
+    root.querySelector<HTMLButtonElement>("[data-download-card]")?.addEventListener("click", downloadCard);
+    root.querySelector<HTMLButtonElement>("[data-close-share]")?.addEventListener("click", () => dialog.close());
+    dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
+
+    const updateSelection = () => {
+      if (dialog.open) return;
+      const selection = window.getSelection();
+      const text = selection?.toString().replace(/\s+/g, " ").trim() || "";
+      const range = selection && selection.rangeCount ? selection.getRangeAt(0) : null;
+      const prose = document.querySelector(".article-prose");
+      if (!range || !prose?.contains(range.commonAncestorContainer) || text.length < 6) { selectionBar.hidden = true; return; }
+      selectedQuote = truncateShareText(text, 320);
+      const rect = range.getBoundingClientRect();
+      selectionBar.style.left = `${Math.max(12, Math.min(window.innerWidth - 132, rect.left + rect.width / 2 - 60))}px`;
+      selectionBar.style.top = `${Math.max(76, rect.top - 50)}px`;
+      selectionBar.hidden = false;
+    };
+    document.addEventListener("selectionchange", () => window.setTimeout(updateSelection, 10));
+    window.addEventListener("scroll", () => { selectionBar.hidden = true; }, { passive: true });
+    root.querySelector<HTMLButtonElement>("[data-selection-copy]")?.addEventListener("click", async () => { await copyText(shareText("quote_copy")); selectionBar.hidden = true; showToast("段落与原文出处已复制"); });
+    root.querySelector<HTMLButtonElement>("[data-selection-weibo]")?.addEventListener("click", () => { shareToPlatform("weibo"); selectionBar.hidden = true; });
+    root.querySelector<HTMLButtonElement>("[data-selection-more]")?.addEventListener("click", () => { selectionBar.hidden = true; openDialog(); });
+  });
+</script>
+
+<style>
+  .article-share { position: relative; margin: 18px 0 24px; }
+  .share-bar { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 52px; padding: 7px 9px 7px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  .share-bar__label, .share-bar__actions, .share-bar__actions button { display: flex; align-items: center; }
+  .share-bar__label { flex: 0 0 auto; gap: 8px; color: var(--text-soft); font-size: .76rem; font-weight: 620; }
+  .share-bar__actions { gap: 2px; }
+  button { cursor: pointer; }
+  .share-bar__actions button { gap: 6px; min-height: 36px; padding: 0 10px; border: 0; border-radius: 4px; background: transparent; color: var(--text-soft); font-size: .7rem; }
+  .share-bar__actions button:hover { background: var(--surface-muted); color: var(--text); }
+  .share-tip { margin: 6px 2px 0; color: var(--muted); font-size: .64rem; }
+  .selection-share { position: fixed; z-index: 90; display: flex; gap: 2px; padding: 4px; border: 1px solid #343432; border-radius: 5px; background: #171717; box-shadow: 0 10px 28px rgba(0,0,0,.2); }
+  .selection-share[hidden] { display: none; }
+  .selection-share button { display: grid; width: 34px; height: 32px; padding: 0; place-items: center; border: 0; border-radius: 3px; background: transparent; color: #fff; }
+  .selection-share button:hover { background: #343432; }
+  .share-dialog { width: min(920px, calc(100% - 32px)); max-height: min(760px, calc(100vh - 40px)); padding: 0; overflow: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); box-shadow: var(--shadow); }
+  .share-dialog::backdrop { background: rgba(20,20,20,.48); backdrop-filter: blur(2px); }
+  .dialog-shell { padding: 24px; }
+  .dialog-header, .dialog-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .dialog-header h2 { margin: 0 0 3px; font-size: 1.05rem; font-weight: 650; }
+  .dialog-header p, .dialog-footer p, .platform-note { margin: 0; color: var(--muted); font-size: .68rem; }
+  .close-button { display: grid; flex: 0 0 auto; width: 38px; height: 38px; padding: 0; place-items: center; border: 0; border-radius: 4px; background: var(--surface-muted); color: var(--text-soft); }
+  .dialog-grid { display: grid; grid-template-columns: minmax(0,1fr) 310px; gap: 28px; margin-top: 24px; }
+  .platforms { display: grid; align-content: start; gap: 22px; }
+  .platforms h3 { margin: 0 0 9px; color: var(--muted); font-size: .68rem; font-weight: 620; }
+  .platform-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 7px; }
+  .platform-grid button { display: grid; min-width: 0; min-height: 76px; padding: 9px 5px; place-items: center; border: 1px solid var(--line); border-radius: 5px; background: #fff; color: var(--text-soft); font-size: .66rem; }
+  .platform-grid button:hover { border-color: var(--accent-line); background: var(--accent-soft); }
+  .platform-mark { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; background: var(--platform-color); color: #fff; font-size: .68rem; font-weight: 700; }
+  .share-utilities { display: flex; flex-wrap: wrap; gap: 7px; }
+  .share-utilities button { display: inline-flex; align-items: center; gap: 7px; min-height: 38px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 4px; background: #fff; color: var(--text-soft); font-size: .68rem; }
+  .platform-note { margin-top: -14px; line-height: 1.55; }
+  .brand-card { display: flex; min-height: 420px; padding: 22px; flex-direction: column; border: 1px solid var(--line); border-top: 4px solid var(--accent); border-radius: 5px; background: #fff; }
+  .brand-card__brand { display: grid; }
+  .brand-card__brand span { font-size: .86rem; font-weight: 680; }
+  .brand-card__brand small { color: var(--muted); font-size: .6rem; }
+  .brand-card blockquote { margin: 54px 0 32px; color: var(--text); font-size: 1.28rem; font-weight: 600; line-height: 1.65; }
+  .brand-card__source { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin-top: auto; padding-top: 18px; border-top: 1px solid var(--line); }
+  .brand-card__source div { display: grid; gap: 2px; }
+  .brand-card__source span { color: var(--muted); font-size: .6rem; }
+  .brand-card__source strong { font-size: .63rem; font-weight: 600; }
+  .brand-card__source img { width: 78px; height: 78px; }
+  .dialog-footer { margin-top: 24px; padding-top: 15px; border-top: 1px solid var(--line); }
+  .dialog-footer a { display: inline-flex; align-items: center; gap: 5px; color: var(--accent); font-size: .68rem; font-weight: 620; text-decoration: none; }
+  .share-toast { position: fixed; right: 22px; bottom: 22px; z-index: 110; padding: 9px 13px; border-radius: 4px; background: #171717; color: #fff; font-size: .7rem; box-shadow: var(--shadow); }
+  @media (max-width: 720px) {
+    .share-bar { align-items: flex-start; }
+    .share-bar__actions { display: grid; grid-template-columns: repeat(5,38px); }
+    .share-bar__actions button { display: grid; width: 38px; padding: 0; place-items: center; }
+    .share-bar__actions button span { display: none; }
+    .dialog-shell { padding: 18px; }
+    .dialog-grid { grid-template-columns: 1fr; }
+    .brand-card { min-height: 360px; order: -1; }
+  }
+  @media (max-width: 420px) {
+    .share-bar__label span { display: none; }
+    .share-bar__actions { grid-template-columns: repeat(5,36px); }
+    .share-bar__actions button { width: 36px; }
+    .share-dialog { width: calc(100% - 20px); max-height: calc(100vh - 20px); }
+    .dialog-header { align-items: flex-start; }
+    .platform-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .brand-card blockquote { margin-top: 40px; font-size: 1.12rem; }
+    .share-toast { right: 16px; bottom: 82px; left: 16px; text-align: center; }
+  }
+</style>
