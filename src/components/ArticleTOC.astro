@@ -50,8 +50,8 @@ const visibleHeadings = headings.filter((heading) => heading.depth === 2 || head
 <script>
   const tocLinks = [...document.querySelectorAll(".toc a[href^='#']")];
   const sections = tocLinks
-    .map((link) => document.querySelector(link.getAttribute("href") || ""))
-    .filter((section): section is Element => section !== null);
+    .map((link) => document.getElementById((link.getAttribute("href") || "").slice(1)))
+    .filter((section): section is HTMLElement => section !== null);
 
   if (sections.length && "IntersectionObserver" in window) {
     const observer = new IntersectionObserver((entries) => {

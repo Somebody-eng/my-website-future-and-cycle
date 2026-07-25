@@ -7,6 +7,7 @@ import Breadcrumb from "@components/Breadcrumb.astro";
 import Comments from "@components/Comments.astro";
 import Disclaimer from "@components/Disclaimer.astro";
 import RelatedPosts from "@components/RelatedPosts.astro";
+import ReadingControls from "@components/ReadingControls.astro";
 import { editorProfile } from "@lib/people";
 import { categoryHref, tagHref } from "@lib/site";
 import { getPublishedPosts, getRelatedPosts } from "@lib/posts";
@@ -56,6 +57,7 @@ const nextMeeting = meetingIndex >= 0 && meetingIndex < meetingPosts.length - 1 
         </header>
 
         <Disclaimer text={post.data.disclaimer} />
+        <ReadingControls />
         <ArticleTOC headings={headings} mode="mobile" />
         <AdSlot slot="article-top" label="文章顶部广告" />
 
@@ -118,6 +120,8 @@ const nextMeeting = meetingIndex >= 0 && meetingIndex < meetingPosts.length - 1 
 
 <style>
   .article-page {
+    --reader-font-size: 17px;
+    --reader-line-height: 1.95;
     padding-top: 30px;
     padding-bottom: 60px;
   }
@@ -230,6 +234,12 @@ const nextMeeting = meetingIndex >= 0 && meetingIndex < meetingPosts.length - 1 
 
   .article-prose {
     margin-top: 28px;
+  }
+
+  .article-prose :global(p),
+  .article-prose :global(li) {
+    font-size: var(--reader-font-size);
+    line-height: var(--reader-line-height);
   }
 
   .meeting-pagination {

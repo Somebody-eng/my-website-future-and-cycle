@@ -1,0 +1,167 @@
+---
+import { Minus, Plus, RotateCcw, Type } from "@lucide/astro";
+---
+
+<section class="reading-controls" data-reading-controls aria-label="阅读字号设置">
+  <div class="reading-controls__label">
+    <Type size={17} stroke-width={1.7} aria-hidden="true" />
+    <span>阅读字号</span>
+  </div>
+  <div class="reading-controls__actions" role="group" aria-label="调整文章字号">
+    <button type="button" data-font-decrease aria-label="减小字号" title="减小字号">
+      <Minus size={17} stroke-width={1.8} aria-hidden="true" />
+    </button>
+    <output data-font-value aria-live="polite">标准</output>
+    <button type="button" data-font-increase aria-label="增大字号" title="增大字号">
+      <Plus size={17} stroke-width={1.8} aria-hidden="true" />
+    </button>
+    <button class="reset" type="button" data-font-reset aria-label="恢复默认字号" title="恢复默认字号">
+      <RotateCcw size={16} stroke-width={1.7} aria-hidden="true" />
+    </button>
+  </div>
+</section>
+
+<script>
+  const STORAGE_KEY = "future-cycle-reader-font-size";
+  const MIN_SIZE = 16;
+  const MAX_SIZE = 22;
+  const DEFAULT_SIZE = 17;
+
+  document.querySelectorAll<HTMLElement>("[data-reading-controls]").forEach((controls) => {
+    const article = controls.closest<HTMLElement>(".article-page");
+    const decrease = controls.querySelector<HTMLButtonElement>("[data-font-decrease]");
+    const increase = controls.querySelector<HTMLButtonElement>("[data-font-increase]");
+    const reset = controls.querySelector<HTMLButtonElement>("[data-font-reset]");
+    const value = controls.querySelector<HTMLOutputElement>("[data-font-value]");
+    if (!article || !decrease || !increase || !reset || !value) return;
+
+    let size = DEFAULT_SIZE;
+    try {
+      const saved = Number.parseInt(localStorage.getItem(STORAGE_KEY) || "", 10);
+      if (saved >= MIN_SIZE && saved <= MAX_SIZE) size = saved;
+    } catch {
+      // Reading preferences remain usable when local storage is unavailable.
+    }
+
+    const applySize = (nextSize: number, persist = true) => {
+      size = Math.min(MAX_SIZE, Math.max(MIN_SIZE, nextSize));
+      article.style.setProperty("--reader-font-size", `${size}px`);
+      article.style.setProperty("--reader-line-height", size >= 21 ? "1.82" : size >= 19 ? "1.88" : "1.95");
+      value.textContent = size === DEFAULT_SIZE ? "标准" : `${size}px`;
+      decrease.disabled = size === MIN_SIZE;
+      increase.disabled = size === MAX_SIZE;
+      reset.disabled = size === DEFAULT_SIZE;
+
+      if (persist) {
+        try {
+          localStorage.setItem(STORAGE_KEY, String(size));
+        } catch {
+          // Keep the current page setting even if persistence is unavailable.
+        }
+      }
+
+      requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
+    };
+
+    decrease.addEventListener("click", () => applySize(size - 1));
+    increase.addEventListener("click", () => applySize(size + 1));
+    reset.addEventListener("click", () => {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch {
+        // Reset still applies to the current page without local storage.
+      }
+      applySize(DEFAULT_SIZE, false);
+    });
+
+    applySize(size, false);
+  });
+</script>
+
+<style>
+  .reading-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 52px;
+    margin: 18px 0;
+    padding: 7px 9px 7px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.97);
+  }
+
+  .reading-controls__label,
+  .reading-controls__actions {
+    display: flex;
+    align-items: center;
+  }
+
+  .reading-controls__label {
+    gap: 8px;
+    color: var(--text-soft);
+    font-size: 0.76rem;
+    font-weight: 620;
+  }
+
+  .reading-controls__actions {
+    gap: 4px;
+  }
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-soft);
+    cursor: pointer;
+  }
+
+  button:hover:not(:disabled) {
+    background: var(--surface-muted);
+    color: var(--text);
+  }
+
+  button:disabled {
+    color: var(--muted-light);
+    cursor: default;
+  }
+
+  button.reset {
+    margin-left: 4px;
+    border-left: 1px solid var(--line);
+    border-radius: 0 4px 4px 0;
+  }
+
+  output {
+    width: 48px;
+    color: var(--muted);
+    font-size: 0.7rem;
+    text-align: center;
+  }
+
+  @media (max-width: 900px) {
+    .reading-controls {
+      position: sticky;
+      top: calc(var(--header-height) + 8px);
+      z-index: 30;
+      box-shadow: 0 8px 22px rgba(18, 18, 18, 0.06);
+    }
+  }
+
+  @media (max-width: 390px) {
+    .reading-controls {
+      gap: 8px;
+      padding-left: 10px;
+    }
+
+    .reading-controls__label span {
+      display: none;
+    }
+  }
+</style>
