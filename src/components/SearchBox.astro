@@ -1,59 +1,24 @@
 ---
-import { Search } from "@lucide/astro";
+import { Search, X } from "@lucide/astro";
+interface Props { placeholder?: string; }
+const { placeholder = "输入关键词、栏目或标签" } = Astro.props;
 ---
-
 <label class="search-box">
-  <Search size={19} stroke-width={1.8} aria-hidden="true" />
+  <Search size={20} stroke-width={1.7} aria-hidden="true" />
   <span class="sr-only">搜索文章</span>
-  <input id="site-search" type="search" placeholder="输入关键词、栏目或标签" autocomplete="off" />
-  <kbd>⌘ K</kbd>
+  <input id="site-search" type="search" placeholder={placeholder} autocomplete="off" enterkeyhint="search" />
+  <button id="clear-search" type="button" aria-label="清空搜索" title="清空搜索"><X size={17} stroke-width={1.7} /></button>
+  <kbd>Ctrl K</kbd>
 </label>
-
 <script>
   const input = document.querySelector<HTMLInputElement>("#site-search");
+  const clear = document.querySelector<HTMLButtonElement>("#clear-search");
   document.addEventListener("keydown", (event) => {
-    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-      event.preventDefault();
-      input?.focus();
-    }
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); input?.focus(); }
+    if (input && event.key === "Escape" && document.activeElement === input) { input.value = ""; input.dispatchEvent(new Event("input", { bubbles: true })); }
   });
+  clear?.addEventListener("click", () => { if (!input) return; input.value = ""; input.focus(); input.dispatchEvent(new Event("input", { bubbles: true })); });
 </script>
-
 <style>
-  .search-box {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 12px;
-    min-height: 56px;
-    padding: 0 16px;
-    border: 1px solid var(--line-strong);
-    border-radius: 6px;
-    background: #fff;
-    color: var(--muted);
-  }
-
-  input {
-    width: 100%;
-    border: 0;
-    outline: 0;
-    background: transparent;
-    color: var(--text);
-    font: inherit;
-  }
-
-  input::placeholder { color: var(--muted); }
-
-  kbd {
-    padding: 3px 7px;
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    background: var(--surface);
-    color: var(--muted);
-    font: 12px/1.4 var(--font-sans);
-  }
-
-  @media (max-width: 640px) {
-    kbd { display: none; }
-  }
+  .search-box{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:12px;min-height:60px;padding:0 15px 0 18px;border:1px solid #aaa9a4;border-radius:var(--radius);background:#fff;color:var(--muted)}input{width:100%;border:0;outline:0;background:transparent;color:var(--text);font-size:.88rem}input::placeholder{color:var(--muted)}button{display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;background:transparent;color:var(--muted);cursor:pointer}button:hover{color:var(--text)}kbd{padding:3px 7px;border:1px solid var(--line);border-radius:4px;background:var(--surface-muted);color:var(--muted);font:11px/1.4 Inter,sans-serif}@media(max-width:640px){kbd{display:none}.search-box{grid-template-columns:auto minmax(0,1fr) auto;min-height:56px}}
 </style>

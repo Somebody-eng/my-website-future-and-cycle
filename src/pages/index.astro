@@ -1,618 +1,110 @@
 ---
-import {
-  ArrowRight,
-  BookOpenText,
-  BrainCircuit,
-  BriefcaseBusiness,
-  Calculator,
-  Cpu,
-  Landmark,
-  Lightbulb,
-  ChartNoAxesCombined,
-  UserRound
-} from "@lucide/astro";
+import { ArrowRight, BrainCircuit, Building2, Cpu, Search, Sprout } from "@lucide/astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import ArticleCard from "@components/ArticleCard.astro";
 import DailyQuote from "@components/DailyQuote.astro";
-import KnowledgeArc from "@components/KnowledgeArc.astro";
 import PeopleMap from "@components/PeopleMap.astro";
-import { categories, SITE_DESCRIPTION, SITE_NAME } from "@lib/site";
+import { categories, categoryHref, SITE_DESCRIPTION, SITE_NAME } from "@lib/site";
 import { getPublishedPosts } from "@lib/posts";
 
 const posts = await getPublishedPosts();
-const featured = posts.filter((post) => post.data.featured).slice(0, 4);
-const featuredPosts = featured.length >= 4 ? featured : posts.slice(0, 4);
+const weeklyPost = posts.find((post) => post.slug === "owner-earnings-buffett") ?? posts[0];
 const latest = posts.slice(0, 6);
-const meetingPosts = posts
-  .filter((post) => post.data.category === "伯克希尔股东会实录")
-  .sort((a, b) => Number(a.slug.match(/\d{4}/)?.[0]) - Number(b.slug.match(/\d{4}/)?.[0]));
-const meetingPreviewPosts = meetingPosts.slice(-5);
+const recentlyUpdated = [...posts].sort((a, b) => b.data.updatedDate.valueOf() - a.data.updatedDate.valueOf()).slice(0, 6);
+const meetingPosts = posts.filter((post) => post.data.category === "伯克希尔股东会实录").sort((a, b) => Number(b.slug.match(/\d{4}/)?.[0]) - Number(a.slug.match(/\d{4}/)?.[0]));
+const meetingPreviewPosts = meetingPosts.slice(0, 5).map((post) => {
+  const year = post.slug.match(/\d{4}/)?.[0] ?? "";
+  return { post, year, displayTitle: post.data.title.replace(`${year}年伯克希尔股东会实录：`, "") };
+});
+const latestDate = posts.reduce((date, post) => post.data.updatedDate > date ? post.data.updatedDate : date, posts[0]?.data.updatedDate ?? new Date());
 
-const categoryIcons = [BookOpenText, BriefcaseBusiness, BrainCircuit, Landmark, UserRound, Cpu, ChartNoAxesCombined, Calculator, Lightbulb];
-const topicTabs = ["全部", "伯克希尔股东会", "巴菲特为什么", "芒格思维模型", "好生意", "AI科技", "周期与趋势"];
+const readingEntrances = [
+  { title: "看懂一门好生意", description: "从商业模式、现金流与护城河判断企业质量。", icon: Building2, href: categoryHref("好生意案例库"), links: ["商业模式与护城河", "现金流与财务质量", "定价权与竞争优势"] },
+  { title: "提升决策质量", description: "用思维模型、概率和反向思考减少错误。", icon: BrainCircuit, href: categoryHref("芒格的思维模型"), links: ["决策框架与思维模型", "风险识别与概率思维", "激励机制与行为偏差"] },
+  { title: "建立长期能力", description: "把长期主义转化为职业、学习与副业选择。", icon: Sprout, href: categoryHref("长期主义与普通人"), links: ["职业护城河", "能力复利", "副业与个人经营"] }
+];
+
+const paths = [
+  { index: "01", title: "企业质量", href: categoryHref("好生意案例库"), topics: ["现金流", "护城河", "定价权", "资本回报", "管理层"] },
+  { index: "02", title: "理性决策", href: categoryHref("芒格的思维模型"), topics: ["多元模型", "反向思考", "概率", "激励机制", "能力圈"] },
+  { index: "03", title: "AI 与科技", href: categoryHref("AI与科技巨头"), topics: ["算力经济", "平台生态", "资本开支", "技术周期", "竞争优势"] },
+  { index: "04", title: "经营者思想", href: categoryHref("人物思想地图"), topics: ["资本配置", "企业文化", "消费者导向", "长期主义", "第一性原理"] }
+];
+const formatDate = (date: Date) => date.toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" });
 ---
 
 <BaseLayout title={SITE_NAME} description={SITE_DESCRIPTION}>
   <div class="home-shell container">
-    <section class="hero-dashboard" aria-labelledby="home-title">
-      <div class="intro">
-        <h1 id="home-title">未来与周期</h1>
-        <p class="subtitle">长期主义商业思想笔记</p>
-        <p class="intro-copy">用商业常识理解企业、周期与人的长期成长。</p>
+    <section class="weekly-grid" aria-labelledby="weekly-title">
+      <article class="weekly-feature">
+        <p class="section-label">本周核心问题</p>
+        <h1 id="weekly-title">现金流如何决定<br />企业的战略自由度？</h1>
+        <p class="weekly-summary">真正的战略选择不来自愿景，而来自现金流的可支配性。拥有持续产生自由现金流的能力，企业才有余地穿越不确定性、投入未来，并等待真正重要的机会。</p>
+        <a class="read-link" href={`/posts/${weeklyPost.slug}/`}>阅读专题文章 <ArrowRight size={17} stroke-width={1.6} /></a>
+      </article>
+      <aside class="weekly-discovery" aria-label="站内发现">
+        <form class="home-search" action="/search/" method="get">
+          <Search size={21} stroke-width={1.6} aria-hidden="true" />
+          <label class="sr-only" for="home-search-input">搜索全站文章</label>
+          <input id="home-search-input" name="q" type="search" placeholder="搜索文章、人物、概念与案例" autocomplete="off" />
+          <button type="submit" aria-label="开始搜索"><ArrowRight size={19} stroke-width={1.6} /></button>
+        </form>
+        <dl class="publication-stats">
+          <div><dt>文章</dt><dd>{posts.length}</dd></div><div><dt>专题栏目</dt><dd>{categories.length}</dd></div>
+          <div><dt>股东会实录</dt><dd>{meetingPosts.length}</dd></div><div><dt>最近更新</dt><dd>{formatDate(latestDate)}</dd></div>
+        </dl>
         <DailyQuote />
-      </div>
-
-      <KnowledgeArc />
-
-      <section class="research" aria-labelledby="research-title">
-        <h2 id="research-title">本期研究</h2>
-        <div class="research-list">
-          <details open>
-            <summary>企业质量</summary>
-            <p>从现金流与护城河判断经营质量。</p>
-          </details>
-          <details>
-            <summary>理性决策</summary>
-            <p>识别偏见、概率与决策边界。</p>
-          </details>
-          <details>
-            <summary>AI 与科技</summary>
-            <p>理解技术周期与商业模式。</p>
-          </details>
-          <details>
-            <summary>普通人的长期主义</summary>
-            <p>把复利思维带入职业与副业。</p>
-          </details>
-        </div>
-      </section>
+      </aside>
     </section>
 
-    <section class="meeting-series" aria-labelledby="meeting-series-title">
-      <div class="meeting-heading">
-        <div>
-          <span>BERKSHIRE MEETING ARCHIVE</span>
-          <h2 id="meeting-series-title">伯克希尔股东会实录</h2>
-        </div>
-        <a href="/categories/%E4%BC%AF%E5%85%8B%E5%B8%8C%E5%B0%94%E8%82%A1%E4%B8%9C%E4%BC%9A%E5%AE%9E%E5%BD%95/">按年份阅读 <ArrowRight size={16} stroke-width={1.5} /></a>
-      </div>
-      <div class="meeting-timeline">
-        {meetingPreviewPosts.map((post) => {
-          const year = post.slug.match(/\d{4}/)?.[0];
-          return (
-            <a href={`/posts/${post.slug}/`}>
-              <time>{year}</time>
-              <strong>{post.data.title.replace(`${year}年伯克希尔股东会实录：`, "")}</strong>
-              <small>{post.data.description}</small>
-            </a>
-          );
+    <section class="reading-entrances" aria-labelledby="entrances-title">
+      <div class="section-intro"><p class="section-label">从问题出发</p><h2 id="entrances-title">你今天想解决什么？</h2></div>
+      <div class="entrance-grid">
+        {readingEntrances.map((entrance) => {
+          const Icon = entrance.icon;
+          return <article class="entrance-item">
+            <div class="entrance-title"><Icon size={25} stroke-width={1.35} aria-hidden="true" /><h3>{entrance.title}</h3></div>
+            <p>{entrance.description}</p>
+            <ul>{entrance.links.map((link) => <li><a href={`/search/?q=${encodeURIComponent(link)}`}>{link}<ArrowRight size={14} stroke-width={1.5} /></a></li>)}</ul>
+            <a class="entrance-all" href={entrance.href}>进入阅读路径</a>
+          </article>;
         })}
       </div>
     </section>
 
-    <nav id="topics" class="topic-tabs" aria-label="研究主题">
-      {topicTabs.map((topic, index) => (
-        <a class:list={{ active: index === 0 }} href={index === 0 ? "/#latest" : `/search/?q=${encodeURIComponent(topic)}`}>
-          {topic}
-        </a>
-      ))}
-      <a class="all-topics" href="/search/" aria-label="查看全部主题"><ArrowRight size={17} stroke-width={1.5} /></a>
-    </nav>
-
-    <section class="featured-grid" aria-label="本期重点文章">
-      {featuredPosts.map((post) => <ArticleCard post={post} variant="featured" />)}
+    <section id="paths" class="topic-paths" aria-labelledby="paths-title">
+      <div class="section-heading"><div><p class="section-label">CURATED PATHS</p><h2 id="paths-title">专题阅读路径</h2></div><a href="/search/">检索全部文章 <ArrowRight size={16} stroke-width={1.5} /></a></div>
+      <div class="path-list">
+        {paths.map((path) => <a class="path-row" href={path.href}><span class="path-index">{path.index}</span><strong>{path.title}</strong><span class="path-topics">{path.topics.map((topic) => <span>{topic}</span>)}</span><ArrowRight class="path-arrow" size={17} stroke-width={1.5} /></a>)}
+      </div>
     </section>
 
-    <section class="home-indexes">
-      <div id="latest" class="index-panel latest-panel">
-        <div class="section-heading">
-          <h2>最新文章</h2>
-          <a href="/search/">查看全部 <ArrowRight size={15} stroke-width={1.5} /></a>
-        </div>
-        <div class="latest-list">
-          {latest.map((post) => (
-            <a href={`/posts/${post.slug}/`}>
-              <span>{post.data.title}</span>
-              <time datetime={post.data.date.toISOString()}>{post.data.date.toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" })}</time>
-            </a>
-          ))}
+    <section class="archive-and-tech">
+      <div class="meeting-series" aria-labelledby="meeting-series-title">
+        <div class="section-heading"><div><p class="section-label">CHRONOLOGICAL ARCHIVE</p><h2 id="meeting-series-title">伯克希尔股东会实录</h2></div><a href={categoryHref("伯克希尔股东会实录")}>完整年份 <ArrowRight size={16} stroke-width={1.5} /></a></div>
+        <div class="meeting-timeline">
+          {meetingPreviewPosts.map(({ post, year, displayTitle }) => <a href={`/posts/${post.slug}/`}><time>{year}</time><span>{displayTitle}</span></a>)}
         </div>
       </div>
+      <aside class="tech-focus"><Cpu size={25} stroke-width={1.35} /><p class="section-label">持续观察</p><h2>AI 的热度很高，商业规律并没有失效。</h2><p>从资本开支、单位经济、平台生态和现金流约束出发，拆解科技巨头的真实竞争力。</p><a href={categoryHref("AI与科技巨头")}>进入 AI 与科技专题 <ArrowRight size={16} stroke-width={1.5} /></a></aside>
+    </section>
 
-      <div id="people" class="index-panel people-panel">
-        <div class="section-heading">
-          <h2>人物思想地图</h2>
-          <a href="/categories/%E4%BA%BA%E7%89%A9%E6%80%9D%E6%83%B3%E5%9C%B0%E5%9B%BE/">查看全部 <ArrowRight size={15} stroke-width={1.5} /></a>
-        </div>
-        <PeopleMap />
+    <section id="latest" class="publishing-index" aria-labelledby="publishing-title">
+      <div class="section-heading"><div><p class="section-label">WHAT'S NEW</p><h2 id="publishing-title">持续更新的研究笔记</h2></div><a href="/search/">查看全部 <ArrowRight size={16} stroke-width={1.5} /></a></div>
+      <div class="publishing-columns">
+        <div><h3>最新发布</h3><div class="article-index">{latest.map((post) => <a href={`/posts/${post.slug}/`}><span>{post.data.title}</span><small>{post.data.category}</small><time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time></a>)}</div></div>
+        <div><h3>最近更新</h3><div class="article-index">{recentlyUpdated.map((post) => <a href={`/posts/${post.slug}/`}><span>{post.data.title}</span><small>{post.data.category}</small><time datetime={post.data.updatedDate.toISOString()}>{formatDate(post.data.updatedDate)}</time></a>)}</div></div>
       </div>
+    </section>
 
-      <div class="index-panel categories-panel">
-        <div class="section-heading"><h2>九个栏目</h2></div>
-        <div class="category-index">
-          {categories.map((category, index) => {
-            const Icon = categoryIcons[index];
-            return (
-              <a href={`/categories/${encodeURIComponent(category.name)}/`}>
-                <Icon size={22} stroke-width={1.35} aria-hidden="true" />
-                <span><strong>{category.name}</strong><small>{category.description}</small></span>
-              </a>
-            );
-          })}
-        </div>
-      </div>
+    <section id="people" class="people-section" aria-labelledby="people-title">
+      <div class="people-copy"><p class="section-label">PEOPLE & IDEAS</p><h2 id="people-title">长期主义者的思想与实践</h2><p>从人物进入方法论，再回到企业经营与普通人的选择。</p></div><PeopleMap />
+    </section>
+
+    <section class="all-categories" aria-labelledby="categories-title">
+      <div class="section-heading"><div><p class="section-label">KNOWLEDGE INDEX</p><h2 id="categories-title">全部栏目</h2></div></div>
+      <div class="category-grid">{categories.map((category, index) => <a href={categoryHref(category.name)}><span>{String(index + 1).padStart(2, "0")}</span><strong>{category.name}</strong><small>{category.description}</small><ArrowRight size={16} stroke-width={1.5} /></a>)}</div>
     </section>
   </div>
 </BaseLayout>
 
-<style>
-  .home-shell {
-    padding-top: 48px;
-  }
-
-  .hero-dashboard {
-    display: grid;
-    grid-template-columns: minmax(270px, 0.9fr) minmax(390px, 1.25fr) minmax(220px, 0.72fr);
-    gap: 44px;
-    align-items: start;
-    padding: 10px 0 46px;
-  }
-
-  .hero-dashboard > * {
-    min-width: 0;
-  }
-
-  .intro h1 {
-    margin: 0;
-    font-size: 48px;
-    font-weight: 620;
-    line-height: 1.15;
-  }
-
-  .subtitle {
-    margin: 7px 0 2px;
-    font-size: 1.15rem;
-  }
-
-  .intro-copy {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.84rem;
-  }
-
-  .research h2 {
-    margin: 0 0 22px;
-    font-size: 0.95rem;
-    font-weight: 650;
-  }
-
-  .research-list {
-    overflow: hidden;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-  }
-
-  details + details {
-    border-top: 1px solid var(--line);
-  }
-
-  summary {
-    position: relative;
-    padding: 16px 38px 16px 16px;
-    cursor: pointer;
-    font-size: 0.82rem;
-    list-style: none;
-  }
-
-  summary::-webkit-details-marker {
-    display: none;
-  }
-
-  summary::after {
-    position: absolute;
-    top: 50%;
-    right: 15px;
-    content: "+";
-    transform: translateY(-50%);
-  }
-
-  details[open] summary::after {
-    content: "−";
-  }
-
-  details p {
-    margin: -5px 16px 15px;
-    color: var(--muted);
-    font-size: 0.72rem;
-    line-height: 1.6;
-  }
-
-  .meeting-series {
-    padding: 28px 0 34px;
-    border-top: 1px solid var(--line);
-  }
-
-  .meeting-heading {
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-    gap: 20px;
-    margin-bottom: 20px;
-  }
-
-  .meeting-heading span {
-    color: var(--accent);
-    font-size: 0.62rem;
-    font-weight: 700;
-  }
-
-  .meeting-heading h2 {
-    margin: 4px 0 0;
-    font-size: 1.2rem;
-    font-weight: 650;
-  }
-
-  .meeting-heading a {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--text-soft);
-    font-size: 0.7rem;
-    text-decoration: none;
-  }
-
-  .meeting-timeline {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    border-block: 1px solid var(--line);
-  }
-
-  .meeting-timeline a {
-    display: grid;
-    min-width: 0;
-    padding: 18px 18px 20px;
-    color: var(--text);
-    text-decoration: none;
-  }
-
-  .meeting-timeline a + a {
-    border-left: 1px solid var(--line);
-  }
-
-  .meeting-timeline time {
-    color: var(--accent);
-    font-size: 1.22rem;
-    font-weight: 650;
-  }
-
-  .meeting-timeline strong {
-    margin-top: 12px;
-    font-size: 0.8rem;
-    font-weight: 620;
-    line-height: 1.55;
-  }
-
-  .meeting-timeline small {
-    display: -webkit-box;
-    overflow: hidden;
-    margin-top: 6px;
-    color: var(--muted);
-    font-size: 0.64rem;
-    line-height: 1.5;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-  }
-
-  .topic-tabs {
-    display: flex;
-    align-items: center;
-    gap: 34px;
-    overflow-x: auto;
-    padding: 16px 0;
-    border-top: 1px solid var(--line);
-    scrollbar-width: none;
-  }
-
-  .topic-tabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .topic-tabs a {
-    position: relative;
-    flex: 0 0 auto;
-    color: var(--text-soft);
-    font-size: 0.74rem;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-
-  .topic-tabs a.active::after {
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--accent);
-    content: "";
-    transform: translateX(-50%);
-  }
-
-  .topic-tabs .all-topics {
-    display: grid;
-    place-items: center;
-    width: 34px;
-    height: 34px;
-    margin-left: auto;
-  }
-
-  .featured-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
-    padding: 10px 0 42px;
-  }
-
-  .home-indexes {
-    display: grid;
-    grid-template-columns: 0.85fr 1.12fr 1.05fr;
-    border-top: 1px solid var(--line);
-  }
-
-  .index-panel {
-    min-width: 0;
-    padding: 30px 34px 40px;
-  }
-
-  .index-panel:first-child {
-    padding-left: 0;
-  }
-
-  .index-panel:last-child {
-    padding-right: 0;
-  }
-
-  .index-panel + .index-panel {
-    border-left: 1px solid var(--line);
-  }
-
-  .section-heading {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    margin-bottom: 22px;
-  }
-
-  .section-heading h2 {
-    margin: 0;
-    font-size: 0.98rem;
-    font-weight: 650;
-  }
-
-  .section-heading a {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    color: var(--muted);
-    font-size: 0.68rem;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-
-  .latest-list {
-    display: grid;
-  }
-
-  .latest-list a {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 14px;
-    align-items: center;
-    padding: 7px 0 7px 14px;
-    color: var(--text-soft);
-    font-size: 0.75rem;
-    text-decoration: none;
-  }
-
-  .latest-list a::before {
-    position: absolute;
-    left: 0;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--accent);
-    content: "";
-  }
-
-  .latest-list span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .latest-list time {
-    color: var(--muted);
-    font-size: 0.68rem;
-  }
-
-  .category-index {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px 18px;
-  }
-
-  .category-index a {
-    display: flex;
-    gap: 10px;
-    min-width: 0;
-    color: var(--text-soft);
-    text-decoration: none;
-  }
-
-  .category-index svg {
-    flex: 0 0 auto;
-    margin-top: 2px;
-  }
-
-  .category-index span {
-    display: grid;
-    min-width: 0;
-  }
-
-  .category-index strong {
-    overflow: hidden;
-    font-size: 0.76rem;
-    font-weight: 620;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .category-index small {
-    display: -webkit-box;
-    overflow: hidden;
-    color: var(--muted);
-    font-size: 0.64rem;
-    line-height: 1.45;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
-  }
-
-  @media (max-width: 1160px) {
-    .hero-dashboard {
-      grid-template-columns: 0.9fr 1.2fr;
-    }
-
-    .research {
-      grid-column: 1 / -1;
-    }
-
-    .research-list {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-    }
-
-    details + details {
-      border-top: 0;
-      border-left: 1px solid var(--line);
-    }
-
-    .featured-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .meeting-timeline {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .meeting-timeline a:nth-child(4) {
-      border-left: 0;
-    }
-
-    .meeting-timeline a:nth-child(n + 4) {
-      border-top: 1px solid var(--line);
-    }
-
-    .home-indexes {
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .categories-panel {
-      grid-column: 1 / -1;
-      border-top: 1px solid var(--line);
-      border-left: 0 !important;
-      padding-left: 0;
-    }
-  }
-
-  @media (max-width: 720px) {
-    .home-shell {
-      padding-top: 30px;
-    }
-
-    .hero-dashboard {
-      grid-template-columns: 1fr;
-      gap: 42px;
-      padding: 0 0 28px;
-    }
-
-    .intro h1 {
-      font-size: 38px;
-    }
-
-    .subtitle {
-      font-size: 1.08rem;
-    }
-
-    .research {
-      grid-column: auto;
-    }
-
-    .research-list {
-      display: flex;
-      overflow-x: auto;
-    }
-
-    .research-list details {
-      flex: 0 0 175px;
-      border-top: 0;
-      border-left: 1px solid var(--line);
-    }
-
-    .research-list details:first-child {
-      border-left: 0;
-    }
-
-    .topic-tabs {
-      gap: 28px;
-    }
-
-    .meeting-heading {
-      align-items: center;
-    }
-
-    .meeting-timeline {
-      display: flex;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-    }
-
-    .meeting-timeline a,
-    .meeting-timeline a:nth-child(4),
-    .meeting-timeline a:nth-child(n + 4) {
-      flex: 0 0 72%;
-      border-top: 0;
-      border-left: 1px solid var(--line);
-      scroll-snap-align: start;
-    }
-
-    .meeting-timeline a:first-child {
-      border-left: 0;
-    }
-
-    .featured-grid {
-      grid-template-columns: 1fr;
-      padding-bottom: 34px;
-    }
-
-    .home-indexes {
-      display: block;
-    }
-
-    .index-panel,
-    .index-panel:first-child,
-    .index-panel:last-child {
-      padding: 28px 0;
-      border-top: 1px solid var(--line);
-      border-left: 0;
-    }
-
-    .home-indexes > .index-panel:first-child {
-      border-top: 0;
-    }
-
-    .category-index {
-      gap: 14px 10px;
-    }
-  }
-</style>
+<style>@import "../styles/home.css";</style>
