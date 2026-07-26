@@ -16,6 +16,18 @@ function plainText(markdown: string) {
     .trim();
 }
 
+function searchableText(markdown: string, category: string) {
+  const text = plainText(markdown);
+  if (category !== "伯克希尔股东会实录" || text.length <= 15000) return text;
+
+  const chunkSize = 5000;
+  const middleStart = Math.max(chunkSize, Math.floor(text.length / 2) - Math.floor(chunkSize / 2));
+  return [
+    text.slice(0, chunkSize),
+    text.slice(middleStart, middleStart + chunkSize),
+    text.slice(-chunkSize)
+  ].join(" … ");
+}
 export const GET: APIRoute = async () => {
   const posts = await getPublishedPosts();
   const index = posts.map((post) => ({
@@ -27,7 +39,7 @@ export const GET: APIRoute = async () => {
     date: post.data.date.toISOString(),
     updatedDate: post.data.updatedDate.toISOString(),
     readingTime: post.data.readingTime,
-    content: plainText(post.body)
+    content: searchableText(post.body, post.data.category)
   }));
 
   return new Response(JSON.stringify(index), {
