@@ -6,7 +6,7 @@ const site = process.env.PUBLIC_SITE_URL || "https://future-cycle.pages.dev";
 export default defineConfig({
   site,
   output: "static",
-  integrations: [sitemap()],
+  integrations: [sitemap({ filter: (page) => !page.endsWith("/comments-admin/") })],
   markdown: {
     shikiConfig: {
       theme: "github-light"

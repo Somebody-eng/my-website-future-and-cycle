@@ -11,6 +11,7 @@ interface Props {
   image?: string;
   canonical?: string;
   type?: "website" | "article";
+  noindex?: boolean;
 }
 
 const {
@@ -18,7 +19,8 @@ const {
   description = SITE_DESCRIPTION,
   image = "/images/covers/default.svg",
   canonical = Astro.url.pathname,
-  type = "website"
+  type = "website",
+  noindex = false
 } = Astro.props;
 
 const pageTitle = title === SITE_NAME ? title : `${title}｜${SITE_NAME}`;
@@ -35,7 +37,7 @@ const gaId = import.meta.env.PUBLIC_GA_ID;
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
-    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="robots" content={noindex ? "noindex,nofollow" : "index,follow,max-image-preview:large"} />
     <meta property="og:locale" content="zh_CN" />
     <meta property="og:type" content={type} />
     <meta property="og:site_name" content={SITE_NAME} />

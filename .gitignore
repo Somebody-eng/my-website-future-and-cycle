@@ -1,8 +1,10 @@
 node_modules/
 dist/
 .astro/
+.wrangler/
 .env
 .env.local
+.comments-secrets.local
 npm-debug.log*
 reports/*.log
 .DS_Store

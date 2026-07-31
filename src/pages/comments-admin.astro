@@ -1,0 +1,207 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+const commentsApi = import.meta.env.PUBLIC_COMMENTS_API_URL || "/api/comments";
+const adminApi = commentsApi.replace(/\/comments\/?$/, "/comments-admin");
+---
+
+<BaseLayout title="留言审核" description="站内留言审核工具。" canonical="/comments-admin/" noindex>
+  <section class="admin-page" data-comments-admin data-api-url={adminApi}>
+    <div class="container admin-container">
+      <header class="admin-header">
+        <div>
+          <p>CONTENT MODERATION</p>
+          <h1>留言审核</h1>
+        </div>
+        <a href="/">返回网站</a>
+      </header>
+
+      <section class="access-panel" aria-labelledby="access-title">
+        <div>
+          <h2 id="access-title">审核凭证</h2>
+          <p>凭证只保存在当前浏览器会话，关闭标签页后自动清除。</p>
+        </div>
+        <form data-secret-form>
+          <label for="admin-secret">管理员密钥</label>
+          <div class="secret-control">
+            <input id="admin-secret" type="password" autocomplete="current-password" required data-secret />
+            <button type="submit">进入审核</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="moderation" data-moderation hidden>
+        <nav class="filters" aria-label="留言状态">
+          <button type="button" data-status="pending" aria-pressed="true">待审核</button>
+          <button type="button" data-status="approved" aria-pressed="false">已公开</button>
+          <button type="button" data-status="rejected" aria-pressed="false">已拒绝</button>
+        </nav>
+        <p class="admin-status" data-admin-status role="status" aria-live="polite"></p>
+        <div class="admin-list" data-admin-list></div>
+      </section>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  interface AdminComment {
+    id: number;
+    slug: string;
+    parentId: number | null;
+    name: string;
+    content: string;
+    status: "pending" | "approved" | "rejected";
+    createdAt: string;
+  }
+
+  const createText = (tag: string, className: string, value: string) => {
+    const element = document.createElement(tag);
+    element.className = className;
+    element.textContent = value;
+    return element;
+  };
+
+  const root = document.querySelector<HTMLElement>("[data-comments-admin]");
+  if (root) {
+    const apiUrl = root.dataset.apiUrl || "/api/comments-admin";
+    const secretForm = root.querySelector<HTMLFormElement>("[data-secret-form]");
+    const secretInput = root.querySelector<HTMLInputElement>("[data-secret]");
+    const moderation = root.querySelector<HTMLElement>("[data-moderation]");
+    const list = root.querySelector<HTMLElement>("[data-admin-list]");
+    const statusText = root.querySelector<HTMLElement>("[data-admin-status]");
+    const filterButtons = [...root.querySelectorAll<HTMLButtonElement>("[data-status]")];
+    let activeStatus = "pending";
+    let secret = sessionStorage.getItem("comments-admin-secret") || "";
+
+    const setStatus = (message: string, error = false) => {
+      if (!statusText) return;
+      statusText.textContent = message;
+      statusText.classList.toggle("error", error);
+    };
+
+    const request = async (method: "GET" | "PATCH", body?: Record<string, unknown>) => {
+      const url = method === "GET" ? `${apiUrl}?status=${activeStatus}` : apiUrl;
+      const response = await fetch(url, {
+        method,
+        headers: { authorization: `Bearer ${secret}`, ...(body ? { "content-type": "application/json" } : {}) },
+        body: body ? JSON.stringify(body) : undefined
+      });
+      const data = await response.json() as { comments?: AdminComment[]; error?: string };
+      if (!response.ok) throw new Error(data.error || "请求失败");
+      return data;
+    };
+
+    const actionButton = (label: string, action: "approve" | "reject" | "delete", id: number, tone = "") => {
+      const button = createText("button", `action ${tone}`, label) as HTMLButtonElement;
+      button.type = "button";
+      button.addEventListener("click", async () => {
+        if (action === "delete" && !window.confirm("确定永久删除这条留言吗？")) return;
+        button.disabled = true;
+        try {
+          await request("PATCH", { id, action });
+          await load();
+        } catch (error) {
+          setStatus(error instanceof Error ? error.message : "操作失败", true);
+          button.disabled = false;
+        }
+      });
+      return button;
+    };
+
+    const render = (comments: AdminComment[]) => {
+      if (!list) return;
+      list.replaceChildren();
+      if (!comments.length) {
+        list.append(createText("p", "empty", "当前状态下没有留言。"));
+        return;
+      }
+      comments.forEach((comment) => {
+        const article = document.createElement("article");
+        article.className = "admin-comment";
+        const meta = document.createElement("div");
+        meta.className = "comment-meta";
+        meta.append(createText("strong", "", comment.name));
+        meta.append(createText("span", "", new Date(comment.createdAt).toLocaleString("zh-CN")));
+        meta.append(createText("code", "", comment.slug));
+        article.append(meta, createText("p", "comment-body", comment.content));
+        const actions = document.createElement("div");
+        actions.className = "actions";
+        if (comment.status !== "approved") actions.append(actionButton("通过", "approve", comment.id, "primary"));
+        if (comment.status !== "rejected") actions.append(actionButton("拒绝", "reject", comment.id));
+        actions.append(actionButton("删除", "delete", comment.id, "danger"));
+        article.append(actions);
+        list.append(article);
+      });
+    };
+
+    async function load() {
+      setStatus("正在读取留言...");
+      try {
+        const data = await request("GET");
+        render(data.comments || []);
+        setStatus(`共 ${data.comments?.length || 0} 条`);
+        if (moderation) moderation.hidden = false;
+      } catch (error) {
+        setStatus(error instanceof Error ? error.message : "无法读取留言", true);
+      }
+    }
+
+    secretForm?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      secret = secretInput?.value.trim() || "";
+      sessionStorage.setItem("comments-admin-secret", secret);
+      load();
+    });
+
+    filterButtons.forEach((button) => button.addEventListener("click", () => {
+      activeStatus = button.dataset.status || "pending";
+      filterButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+      load();
+    }));
+
+    if (secret && secretInput) {
+      secretInput.value = secret;
+      load();
+    }
+  }
+</script>
+
+<style>
+  .admin-page { min-height: 70vh; padding: 44px 0 80px; background: var(--background); }
+  .admin-container { max-width: 900px; }
+  .admin-header { display: flex; align-items: flex-end; justify-content: space-between; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+  .admin-header p { margin: 0 0 7px; color: var(--accent); font-size: 0.62rem; font-weight: 700; }
+  .admin-header h1 { margin: 0; font-size: 2rem; }
+  .admin-header a { color: var(--muted); font-size: 0.72rem; text-decoration: none; }
+  .access-panel { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(320px, 1.2fr); gap: 32px; padding: 26px 0; border-bottom: 1px solid var(--line); }
+  .access-panel h2 { margin: 0 0 5px; font-size: 0.86rem; }
+  .access-panel p { margin: 0; color: var(--muted); font-size: 0.68rem; line-height: 1.6; }
+  .access-panel form { display: grid; gap: 7px; }
+  .access-panel label { font-size: 0.66rem; font-weight: 650; }
+  .secret-control { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+  .secret-control input { min-width: 0; height: 40px; padding: 0 11px; border: 1px solid var(--line); border-radius: 6px; font: inherit; }
+  button { font: inherit; cursor: pointer; }
+  .secret-control button { padding: 0 14px; border: 0; border-radius: 6px; color: #fff; background: var(--accent); font-size: 0.7rem; font-weight: 650; }
+  .filters { display: flex; gap: 3px; margin-top: 24px; border-bottom: 1px solid var(--line); }
+  .filters button { padding: 10px 13px; border: 0; border-bottom: 2px solid transparent; color: var(--muted); background: transparent; font-size: 0.7rem; }
+  .filters button[aria-pressed="true"] { border-color: var(--accent); color: var(--text); font-weight: 650; }
+  .admin-status { min-height: 1.5em; margin: 14px 0 0; color: var(--muted); font-size: 0.66rem; }
+  .admin-status.error { color: #a83c32; }
+  .admin-list { display: grid; }
+  .admin-list :global(.admin-comment) { padding: 20px 0; border-bottom: 1px solid var(--line); }
+  .admin-list :global(.comment-meta) { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline; font-size: 0.66rem; }
+  .admin-list :global(.comment-meta span), .admin-list :global(.comment-meta code) { color: var(--muted); }
+  .admin-list :global(.comment-body) { margin: 11px 0 14px; line-height: 1.75; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .admin-list :global(.actions) { display: flex; gap: 7px; }
+  .admin-list :global(.action) { min-height: 32px; padding: 0 11px; border: 1px solid var(--line); border-radius: 5px; color: var(--text); background: transparent; font-size: 0.66rem; }
+  .admin-list :global(.action.primary) { border-color: var(--accent); color: #fff; background: var(--accent); }
+  .admin-list :global(.action.danger) { color: #a83c32; }
+  .admin-list :global(.empty) { margin: 28px 0; color: var(--muted); font-size: 0.72rem; }
+  @media (max-width: 680px) {
+    .admin-page { padding-top: 28px; }
+    .admin-header { align-items: flex-start; }
+    .access-panel { grid-template-columns: 1fr; gap: 18px; }
+    .secret-control { grid-template-columns: 1fr; }
+    .secret-control button { min-height: 40px; }
+  }
+</style>

@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "future-cycle",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-07-31",
+  "vars": {
+    "COMMENTS_AUTO_APPROVE": "false",
+    "COMMENTS_ALLOWED_ORIGINS": "https://future-cycle.pages.dev,https://somebody-eng.github.io"
+  },
+  "d1_databases": [
+    {
+      "binding": "COMMENTS_DB",
+      "database_name": "future-cycle-comments",
+      "database_id": "474e1e3a-afd5-483c-970b-d943b7a63932"
+    }
+  ]
+}

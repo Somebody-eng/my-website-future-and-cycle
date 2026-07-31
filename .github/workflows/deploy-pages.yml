@@ -31,6 +31,7 @@ jobs:
         run: npm run build:github-pages
         env:
           PUBLIC_SITE_URL: https://somebody-eng.github.io/my-website-future-and-cycle
+          PUBLIC_COMMENTS_API_URL: https://future-cycle.pages.dev/api/comments
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:

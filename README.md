@@ -10,7 +10,7 @@
 
 - Astro + TypeScript
 - Markdown Content Collections
-- 静态生成，无数据库
+- 内容与页面静态生成；留言数据使用 Cloudflare D1 免费额度
 - RSS、sitemap、robots.txt
 - Cloudflare Pages 免费部署
 - pages.dev 免费子域名
@@ -44,9 +44,9 @@ PUBLIC_SITE_URL=https://future-cycle.pages.dev
 PUBLIC_ADSENSE_ENABLED=false
 PUBLIC_ADSENSE_CLIENT=
 PUBLIC_GA_ID=
-PUBLIC_GISCUS_ENABLED=false
-PUBLIC_GISCUS_REPO_ID=
-PUBLIC_GISCUS_CATEGORY_ID=
+PUBLIC_COMMENTS_ENABLED=true
+PUBLIC_COMMENTS_API_URL=
+PUBLIC_TURNSTILE_SITE_KEY=
 ```
 
 说明：
@@ -55,15 +55,36 @@ PUBLIC_GISCUS_CATEGORY_ID=
 - `PUBLIC_ADSENSE_ENABLED`：验证期保持 `false`，页面不会加载广告代码，也不会显示广告空白。
 - `PUBLIC_ADSENSE_CLIENT`：后续 AdSense 客户端 ID。
 - `PUBLIC_GA_ID`：后续 Google Analytics Measurement ID。
-- `PUBLIC_GISCUS_ENABLED`：设为 `true` 后在文章页加载 Giscus 评论。
-- `PUBLIC_GISCUS_REPO_ID`：Giscus 使用的 GitHub 仓库 ID。
-- `PUBLIC_GISCUS_CATEGORY_ID`：Giscus 使用的 Discussions 分类 ID。
+- `PUBLIC_COMMENTS_ENABLED`：设为 `false` 可关闭文章页留言模块，默认开启。
+- `PUBLIC_COMMENTS_API_URL`：Cloudflare Pages 留言 API。Cloudflare 主站留空即使用同源 `/api/comments`；GitHub Pages 使用 `https://future-cycle.pages.dev/api/comments`。
+- `PUBLIC_TURNSTILE_SITE_KEY`：可选的 Cloudflare Turnstile 站点密钥，留空时不加载验证脚本。
 
 ## 留言互动
 
-文章页默认显示“去 GitHub 留言”，读者可以在仓库 Issues 中创建与当前文章关联的公开讨论。该模式免费、无需数据库，也不会加载额外评论脚本。
+文章页使用 Cloudflare Pages Functions 与 D1 构成的免费站内留言系统。读者无需 GitHub 或其他账号即可提交昵称与留言；留言默认进入待审核状态，通过后才会公开。系统包含蜜罐字段、十分钟三次的频率限制，并只保存加盐后的 IP 摘要。
 
-需要启用页内评论时，在公开 GitHub 仓库中开启 Discussions、安装 Giscus App，并在 [giscus.app/zh-CN](https://giscus.app/zh-CN) 获取仓库 ID 和分类 ID。随后设置上述三个 Giscus 环境变量并重新部署。未填写完整配置时，网站会自动保留 GitHub Issues 留言入口。
+首次部署前执行数据库迁移：
+
+```bash
+npm run db:migrate:remote
+```
+
+在 Cloudflare Pages 项目的 Settings -> Variables and Secrets 中添加两个加密变量：
+
+- `COMMENTS_ADMIN_SECRET`：后台审核密钥，建议使用至少 32 位随机字符。
+- `COMMENTS_HASH_SALT`：IP 摘要盐值，建议使用另一组至少 32 位随机字符。
+
+可选添加 `TURNSTILE_SECRET_KEY`，并在构建变量中设置配套的 `PUBLIC_TURNSTILE_SITE_KEY`。未配置 Turnstile 时，留言仍受频率限制和人工审核保护。
+
+审核入口为 `/comments-admin/`，不会出现在导航或 sitemap 中，并设置了 `noindex`。输入 `COMMENTS_ADMIN_SECRET` 后，可查看待审核、已公开和已拒绝留言。密钥仅保存在当前浏览器的 `sessionStorage`，关闭标签页后清除。
+
+本地联调可先迁移本地 D1：
+
+```bash
+npm run build
+npm run db:migrate:local
+npx wrangler pages dev dist
+```
 
 ## 内容结构
 
@@ -170,7 +191,10 @@ npm run seo:report
    - `PUBLIC_ADSENSE_ENABLED=false`
    - `PUBLIC_ADSENSE_CLIENT=` 留空
    - `PUBLIC_GA_ID=` 留空
-7. 部署完成后访问 Cloudflare 分配的 `pages.dev` 子域名。
+   - `PUBLIC_COMMENTS_ENABLED=true`
+   - `PUBLIC_COMMENTS_API_URL=` 留空
+7. 在 Pages 项目中绑定名为 `COMMENTS_DB` 的 D1 数据库 `future-cycle-comments`，并设置 `COMMENTS_ADMIN_SECRET`、`COMMENTS_HASH_SALT` 两个加密变量。
+8. 部署完成后访问 Cloudflare 分配的 `pages.dev` 子域名。
 
 当前机器未检测到 `git` 命令。推送 GitHub 前，请安装 Git，或使用 GitHub Desktop / GitHub 网页上传代码。
 
@@ -229,7 +253,7 @@ PUBLIC_ADSENSE_CLIENT=ca-pub-xxxxxxxxxxxxxxxx
 
 ## 零成本原则
 
-- 不使用数据库。
+- 文章不使用数据库；留言仅使用 Cloudflare D1 免费额度。
 - 不使用付费服务。
 - 不使用需要信用卡的第三方服务。
 - Cloudflare Pages、GitHub、pages.dev 子域名均可免费使用。

@@ -1,135 +1,291 @@
 ---
-import { ArrowUpRight, MessageCircle } from "@lucide/astro";
+import { MessageCircle, Send, X } from "@lucide/astro";
 
 interface Props {
-  title: string;
+  title?: string;
   slug: string;
 }
 
-const { title, slug } = Astro.props;
-const repo = "Somebody-eng/my-website-future-and-cycle";
-const repoId = import.meta.env.PUBLIC_GISCUS_REPO_ID ?? "";
-const categoryId = import.meta.env.PUBLIC_GISCUS_CATEGORY_ID ?? "";
-const giscusEnabled = import.meta.env.PUBLIC_GISCUS_ENABLED === "true" && repoId && categoryId;
-const siteBase = Astro.site?.href.endsWith("/") ? Astro.site.href : `${Astro.site?.href ?? Astro.url.origin}/`;
-const articleUrl = new URL(`posts/${slug}/`, siteBase).href;
-const issueTitle = `文章留言：${title}`;
-const issueBody = `我想讨论这篇文章：${articleUrl}\n\n我的想法：\n`;
-const issueUrl = `https://github.com/${repo}/issues/new?title=${encodeURIComponent(issueTitle)}&body=${encodeURIComponent(issueBody)}`;
+const { slug } = Astro.props;
+const enabled = import.meta.env.PUBLIC_COMMENTS_ENABLED !== "false";
+const apiUrl = import.meta.env.PUBLIC_COMMENTS_API_URL || "/api/comments";
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || "";
 ---
 
-<section class="comments" aria-labelledby="comments-title">
-  <header>
-    <span class="icon"><MessageCircle size={18} stroke-width={1.7} aria-hidden="true" /></span>
+<section
+  class="comments"
+  aria-labelledby="comments-title"
+  data-comments
+  data-enabled={String(enabled)}
+  data-api-url={apiUrl}
+  data-slug={slug}
+  data-turnstile-site-key={turnstileSiteKey}
+>
+  <header class="comments-heading">
+    <span class="comments-icon"><MessageCircle size={18} stroke-width={1.7} aria-hidden="true" /></span>
     <div>
       <h2 id="comments-title">留言互动</h2>
-      <p>围绕文章讨论观点与案例，请保持具体、友善和独立思考。</p>
+      <p>围绕文章讨论观点与案例。留言审核后公开，无需注册账号。</p>
     </div>
   </header>
 
-  {giscusEnabled ? (
-    <div class="giscus-shell">
-      <script
-        is:inline
-        src="https://giscus.app/client.js"
-        data-repo={repo}
-        data-repo-id={repoId}
-        data-category="文章留言"
-        data-category-id={categoryId}
-        data-mapping="pathname"
-        data-strict="1"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="top"
-        data-theme="light"
-        data-lang="zh-CN"
-        data-loading="lazy"
-        crossorigin="anonymous"
-        async
-      ></script>
-    </div>
+  {enabled ? (
+    <>
+      <form class="comment-form" data-comment-form>
+        <div class="replying" data-replying hidden>
+          <span data-reply-label></span>
+          <button type="button" data-cancel-reply aria-label="取消回复" title="取消回复">
+            <X size={15} aria-hidden="true" />
+          </button>
+        </div>
+        <div class="field">
+          <label for={`comment-name-${slug}`}>昵称</label>
+          <input id={`comment-name-${slug}`} name="name" maxlength="24" autocomplete="nickname" required />
+        </div>
+        <div class="field">
+          <label for={`comment-content-${slug}`}>留言</label>
+          <textarea
+            id={`comment-content-${slug}`}
+            name="content"
+            minlength="2"
+            maxlength="1200"
+            rows="5"
+            placeholder="写下具体的观点、疑问或补充案例"
+            required
+          ></textarea>
+          <span class="counter" data-counter>0 / 1200</span>
+        </div>
+        <div class="trap" aria-hidden="true">
+          <label>网站<input name="website" tabindex="-1" autocomplete="off" /></label>
+        </div>
+        {turnstileSiteKey && <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="light"></div>}
+        <div class="form-footer">
+          <label class="consent">
+            <input type="checkbox" name="consent" required />
+            <span>我已阅读<a href="/privacy/">隐私政策</a></span>
+          </label>
+          <button class="submit-button" type="submit">
+            <Send size={15} stroke-width={1.8} aria-hidden="true" />
+            提交留言
+          </button>
+        </div>
+        <p class="form-status" data-form-status role="status" aria-live="polite"></p>
+      </form>
+
+      <div class="comment-list-wrap">
+        <div class="list-heading">
+          <h3>讨论</h3>
+          <span data-comment-count>正在读取</span>
+        </div>
+        <div class="comment-list" data-comment-list aria-live="polite">
+          <p class="list-message">正在加载留言...</p>
+        </div>
+      </div>
+    </>
   ) : (
-    <div class="fallback">
-      <p>留言暂由 GitHub Issues 承载，点击后可围绕本文创建公开讨论。</p>
-      <a href={issueUrl} target="_blank" rel="noopener noreferrer">
-        去 GitHub 留言
-        <ArrowUpRight size={15} stroke-width={1.7} aria-hidden="true" />
-      </a>
-    </div>
+    <p class="disabled-message">留言功能暂未开放。</p>
   )}
 </section>
 
+{turnstileSiteKey && (
+  <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+)}
+
+<script>
+  interface PublicComment {
+    id: number;
+    parentId: number | null;
+    name: string;
+    content: string;
+    createdAt: string;
+  }
+
+  const textElement = (tag: string, className: string, text: string) => {
+    const element = document.createElement(tag);
+    element.className = className;
+    element.textContent = text;
+    return element;
+  };
+
+  const formatDate = (value: string) => {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime())
+      ? value
+      : new Intl.DateTimeFormat("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
+  };
+
+  document.querySelectorAll<HTMLElement>("[data-comments]").forEach((root) => {
+    if (root.dataset.enabled !== "true") return;
+
+    const apiUrl = root.dataset.apiUrl || "/api/comments";
+    const slug = root.dataset.slug || "";
+    const form = root.querySelector<HTMLFormElement>("[data-comment-form]");
+    const list = root.querySelector<HTMLElement>("[data-comment-list]");
+    const count = root.querySelector<HTMLElement>("[data-comment-count]");
+    const status = root.querySelector<HTMLElement>("[data-form-status]");
+    const counter = root.querySelector<HTMLElement>("[data-counter]");
+    const textarea = form?.elements.namedItem("content") as HTMLTextAreaElement | null;
+    const nameInput = form?.elements.namedItem("name") as HTMLInputElement | null;
+    const replying = root.querySelector<HTMLElement>("[data-replying]");
+    const replyLabel = root.querySelector<HTMLElement>("[data-reply-label]");
+    let parentId: number | null = null;
+
+    if (!form || !list || !count || !status || !textarea || !nameInput) return;
+
+    const cancelReply = () => {
+      parentId = null;
+      if (replying) replying.hidden = true;
+    };
+
+    root.querySelector("[data-cancel-reply]")?.addEventListener("click", cancelReply);
+    textarea.addEventListener("input", () => {
+      if (counter) counter.textContent = `${textarea.value.length} / 1200`;
+    });
+
+    const renderComment = (comment: PublicComment, replies: PublicComment[]) => {
+      const article = document.createElement("article");
+      article.className = comment.parentId ? "comment reply-comment" : "comment";
+
+      const meta = document.createElement("div");
+      meta.className = "comment-meta";
+      meta.append(textElement("strong", "comment-author", comment.name));
+      meta.append(textElement("time", "comment-date", formatDate(comment.createdAt)));
+      article.append(meta, textElement("p", "comment-content", comment.content));
+
+      if (!comment.parentId) {
+        const replyButton = document.createElement("button");
+        replyButton.type = "button";
+        replyButton.className = "reply-button";
+        replyButton.textContent = "回复";
+        replyButton.addEventListener("click", () => {
+          parentId = comment.id;
+          if (replyLabel) replyLabel.textContent = `正在回复 ${comment.name}`;
+          if (replying) replying.hidden = false;
+          textarea.focus();
+          form.scrollIntoView({ behavior: "smooth", block: "center" });
+        });
+        article.append(replyButton);
+      }
+
+      replies.forEach((reply) => article.append(renderComment(reply, [])));
+      return article;
+    };
+
+    const loadComments = async () => {
+      try {
+        const response = await fetch(`${apiUrl}?slug=${encodeURIComponent(slug)}`, { headers: { accept: "application/json" } });
+        const data = await response.json() as { comments?: PublicComment[]; error?: string };
+        if (!response.ok) throw new Error(data.error || "留言读取失败");
+        const comments = data.comments || [];
+        const topLevel = comments.filter((comment) => !comment.parentId);
+        list.replaceChildren();
+        if (!comments.length) {
+          list.append(textElement("p", "list-message", "还没有公开留言，欢迎留下第一个观点。"));
+        } else {
+          topLevel.forEach((comment) => {
+            const replies = comments.filter((item) => item.parentId === comment.id);
+            list.append(renderComment(comment, replies));
+          });
+        }
+        count.textContent = `${comments.length} 条公开留言`;
+      } catch {
+        list.replaceChildren();
+        const message = textElement("p", "list-message", "留言服务暂时不可用，可通过联系方式向本站反馈。");
+        const link = document.createElement("a");
+        link.href = "/contact/";
+        link.textContent = "查看联系方式";
+        list.append(message, link);
+        count.textContent = "暂时不可用";
+      }
+    };
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const submit = form.querySelector<HTMLButtonElement>("button[type='submit']");
+      const formData = new FormData(form);
+      const turnstileToken = formData.get("cf-turnstile-response") || "";
+      status.textContent = "正在提交...";
+      if (submit) submit.disabled = true;
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            slug,
+            parentId,
+            name: formData.get("name"),
+            content: formData.get("content"),
+            website: formData.get("website"),
+            turnstileToken
+          })
+        });
+        const data = await response.json() as { pending?: boolean; error?: string };
+        if (!response.ok) throw new Error(data.error || "提交失败，请稍后重试。");
+        const savedName = nameInput.value;
+        form.reset();
+        nameInput.value = savedName;
+        if (counter) counter.textContent = "0 / 1200";
+        cancelReply();
+        status.textContent = data.pending ? "留言已提交，审核通过后会公开显示。" : "留言已发布。";
+        const turnstile = (window as typeof window & { turnstile?: { reset: () => void } }).turnstile;
+        turnstile?.reset();
+        if (!data.pending) await loadComments();
+      } catch (error) {
+        status.textContent = error instanceof Error ? error.message : "提交失败，请稍后重试。";
+      } finally {
+        if (submit) submit.disabled = false;
+      }
+    });
+
+    loadComments();
+  });
+</script>
+
 <style>
-  .comments {
-    margin-top: 24px;
-    padding: 22px 0;
-    border-top: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
-  }
-
-  header {
-    display: flex;
-    gap: 11px;
-    align-items: flex-start;
-  }
-
-  .icon {
-    display: grid;
-    flex: 0 0 auto;
-    width: 34px;
-    height: 34px;
-    place-items: center;
-    border: 1px solid var(--accent-line);
-    border-radius: 50%;
-    color: var(--accent);
-    background: var(--accent-soft);
-  }
-
-  h2 {
-    margin: 0 0 3px;
-    font-size: 0.92rem;
-    font-weight: 650;
-  }
-
-  header p,
-  .fallback p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.72rem;
-    line-height: 1.6;
-  }
-
-  .giscus-shell,
-  .fallback {
-    margin-top: 18px;
-  }
-
-  .fallback {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    justify-content: space-between;
-    padding: 13px 14px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    background: var(--surface);
-  }
-
-  .fallback a {
-    display: inline-flex;
-    flex: 0 0 auto;
-    gap: 6px;
-    align-items: center;
-    color: var(--accent);
-    font-size: 0.72rem;
-    font-weight: 620;
-    text-decoration: none;
-  }
-
+  .comments { margin-top: 24px; padding: 24px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .comments-heading { display: flex; gap: 11px; align-items: flex-start; }
+  .comments-icon { display: grid; flex: 0 0 auto; width: 34px; height: 34px; place-items: center; border: 1px solid var(--accent-line); border-radius: 50%; color: var(--accent); background: var(--accent-soft); }
+  h2 { margin: 0 0 3px; font-size: 0.92rem; font-weight: 650; }
+  .comments-heading p, .disabled-message { margin: 0; color: var(--muted); font-size: 0.72rem; line-height: 1.6; }
+  .comment-form { position: relative; display: grid; gap: 13px; margin-top: 20px; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  .field { display: grid; gap: 6px; }
+  .field label { font-size: 0.7rem; font-weight: 650; }
+  input, textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--line-strong, var(--line)); border-radius: 6px; color: var(--text); background: var(--background, #fff); font: inherit; font-size: 0.78rem; outline: none; }
+  input { height: 40px; padding: 0 11px; }
+  textarea { min-height: 120px; padding: 10px 11px 25px; line-height: 1.65; resize: vertical; }
+  input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .counter { position: absolute; right: 29px; margin-top: 137px; color: var(--muted); font-size: 0.62rem; pointer-events: none; }
+  .trap { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .form-footer { display: flex; gap: 14px; align-items: center; justify-content: space-between; }
+  .consent { display: flex; gap: 7px; align-items: center; color: var(--muted); font-size: 0.68rem; }
+  .consent input { width: 15px; height: 15px; margin: 0; }
+  .consent a { margin-left: 3px; color: var(--text); }
+  .submit-button { display: inline-flex; min-height: 38px; gap: 7px; align-items: center; justify-content: center; padding: 0 14px; border: 0; border-radius: 6px; color: #fff; background: var(--accent); font: inherit; font-size: 0.72rem; font-weight: 650; cursor: pointer; }
+  .submit-button:disabled { opacity: 0.55; cursor: wait; }
+  .form-status { min-height: 1.5em; margin: 0; color: var(--accent); font-size: 0.68rem; }
+  .replying { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; color: var(--accent); background: var(--accent-soft); font-size: 0.68rem; }
+  .replying button { display: grid; width: 26px; height: 26px; padding: 0; place-items: center; border: 0; color: currentColor; background: transparent; cursor: pointer; }
+  .comment-list-wrap { margin-top: 26px; }
+  .list-heading { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 9px; border-bottom: 1px solid var(--line); }
+  .list-heading h3 { margin: 0; font-size: 0.78rem; }
+  .list-heading span { color: var(--muted); font-size: 0.64rem; }
+  .comment-list { display: grid; }
+  .comment-list :global(.comment) { position: relative; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .comment-list :global(.comment-meta) { display: flex; gap: 9px; align-items: baseline; }
+  .comment-list :global(.comment-author) { font-size: 0.72rem; }
+  .comment-list :global(.comment-date) { color: var(--muted); font-size: 0.62rem; }
+  .comment-list :global(.comment-content) { margin: 7px 0 0; font-size: 0.76rem; line-height: 1.75; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .comment-list :global(.reply-button) { margin-top: 8px; padding: 0; border: 0; color: var(--accent); background: transparent; font: inherit; font-size: 0.65rem; cursor: pointer; }
+  .comment-list :global(.reply-comment) { margin: 13px 0 0 24px; padding: 12px 14px; border: 0; border-left: 2px solid var(--accent-line); background: var(--surface); }
+  .comment-list :global(.list-message), .comment-list > a { margin: 16px 0 0; color: var(--muted); font-size: 0.7rem; }
+  .comment-list > a { color: var(--accent); }
+  .disabled-message { margin-top: 18px; }
   @media (max-width: 540px) {
-    .fallback {
-      display: grid;
-      justify-items: start;
-    }
+    .comment-form { padding: 15px; }
+    .form-footer { align-items: flex-start; flex-direction: column; }
+    .submit-button { width: 100%; }
+    .counter { right: 25px; margin-top: 134px; }
+    .comment-list :global(.reply-comment) { margin-left: 12px; }
   }
 </style>
