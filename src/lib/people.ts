@@ -20,7 +20,7 @@ export const people: PersonProfile[] = [
     name: "查理·芒格",
     label: "芒格",
     idea: "多元思维模型",
-    image: "/images/people/munger.svg",
+    image: "/images/people/munger.jpg",
     imageAlt: "查理·芒格彩色头像",
     href: "/categories/%E8%8A%92%E6%A0%BC%E7%9A%84%E6%80%9D%E7%BB%B4%E6%A8%A1%E5%9E%8B/"
   },
@@ -28,7 +28,7 @@ export const people: PersonProfile[] = [
     name: "段永平",
     label: "段永平",
     idea: "本分与常识",
-    image: "/images/people/duan.svg",
+    image: "/images/people/duan.jpg",
     imageAlt: "段永平彩色头像标识",
     href: "/categories/%E6%AE%B5%E6%B0%B8%E5%B9%B3%E4%B8%8E%E7%BB%8F%E8%90%A5%E6%80%9D%E6%83%B3/"
   },

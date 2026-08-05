@@ -23,7 +23,7 @@ export const dailyQuotes: DailyQuote[] = [
     author: "查理·芒格",
     source: "Poor Charlie's Almanack",
     sourceUrl: "https://www.poorcharliesalmanack.com/",
-    portrait: "/images/people/munger.svg",
+    portrait: "/images/people/munger.jpg",
     portraitAlt: "查理·芒格彩色头像",
     note: "观点解读"
   },
@@ -41,7 +41,7 @@ export const dailyQuotes: DailyQuote[] = [
     author: "段永平",
     source: "段永平经营思想公开讨论解读",
     sourceUrl: "/categories/%E6%AE%B5%E6%B0%B8%E5%B9%B3%E4%B8%8E%E7%BB%8F%E8%90%A5%E6%80%9D%E6%83%B3/",
-    portrait: "/images/people/duan.svg",
+    portrait: "/images/people/duan.jpg",
     portraitAlt: "段永平彩色头像标识",
     note: "观点摘记"
   }
