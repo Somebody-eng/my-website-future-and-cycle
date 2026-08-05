@@ -1,0 +1,59 @@
+---
+import { ArrowRight, Cpu, Plane } from "@lucide/astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import ArticleCard from "@components/ArticleCard.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
+import { categoryHref } from "@lib/site";
+import { getPublishedPosts } from "@lib/posts";
+
+const posts = await getPublishedPosts();
+const aiPosts = posts.filter((post) => post.data.category === "AI与科技巨头");
+const aviationPosts = posts.filter((post) => post.data.category === "低空经济与航空科技");
+const aiPaths = [
+  { title: "AI 基础设施与资本开支", terms: ["资本开支", "数据中心", "算力", "英伟达"] },
+  { title: "模型、推理与单位经济", terms: ["推理", "模型路由", "开源模型", "单位经济"] },
+  { title: "AI 应用与客户留存", terms: ["留存率", "应用", "客户价值"] },
+  { title: "平台、数据与护城河", terms: ["平台", "数据护城河", "生态", "商品化"] },
+  { title: "治理、安全与人工责任", terms: ["人工兜底", "治理", "安全", "责任"] }
+];
+---
+
+<BaseLayout title="前沿产业研究" description="从长期主义和商业基本面出发，研究人工智能与低空经济的技术演进、单位经济、资本约束和商业化周期。" canonical="/industries/">
+  <section class="industry-page">
+    <div class="container">
+      <Breadcrumb items={[{ label: "前沿产业研究" }]} />
+      <header class="industry-hero">
+        <div><p class="eyebrow">FRONTIER INDUSTRY RESEARCH</p><h1>前沿技术值得关注，<br />但商业化需要耐心核算。</h1></div>
+        <p>我们不追逐每日新闻，而是持续追问：技术是否可行，产品能否交付，客户是否付费，单位经济是否成立，以及资本结构能否支撑漫长周期。</p>
+      </header>
+
+      <div class="track-grid">
+        <section class="track">
+          <div class="track-heading"><Cpu size={26} stroke-width={1.35} /><div><span>TRACK 01</span><h2>人工智能</h2></div><strong>{aiPosts.length} 篇</strong></div>
+          <p>沿着基础设施、模型、应用、平台、数据与治理，观察技术能力如何转化为可持续客户价值。</p>
+          <a class="track-link" href={categoryHref("AI与科技巨头")}>浏览全部 AI 研究 <ArrowRight size={16} /></a>
+        </section>
+        <section class="track">
+          <div class="track-heading"><Plane size={26} stroke-width={1.35} /><div><span>TRACK 02</span><h2>低空经济</h2></div><strong>{aviationPosts.length} 篇</strong></div>
+          <p>拆解飞行器、基础设施、运营场景、空域系统、认证安全与商业模式之间相互制约的产业系统。</p>
+          <a class="track-link" href={categoryHref("低空经济与航空科技")}>浏览全部低空研究 <ArrowRight size={16} /></a>
+        </section>
+      </div>
+
+      <section class="ai-paths">
+        <div class="section-heading"><div><p class="eyebrow">AI READING MAP</p><h2>AI 五条阅读路径</h2></div><p>16 篇既有研究按商业问题重新组织，原有 URL 保持不变。</p></div>
+        <div class="path-list">{aiPaths.map((path, index) => <a href={`/search/?q=${encodeURIComponent(path.terms[0])}&category=${encodeURIComponent("AI与科技巨头")}`}><span>{String(index + 1).padStart(2, "0")}</span><strong>{path.title}</strong><small>{path.terms.join(" / ")}</small><ArrowRight size={16} /></a>)}</div>
+      </section>
+
+      <section class="latest-industries">
+        <div class="section-heading"><div><p class="eyebrow">LATEST RESEARCH</p><h2>最新产业研究</h2></div></div>
+        <div class="latest-grid"><div><h3>人工智能</h3>{aiPosts.slice(0, 4).map((post) => <ArticleCard post={post} variant="row" />)}</div><div><h3>低空经济</h3>{aviationPosts.length ? aviationPosts.slice(0, 4).map((post) => <ArticleCard post={post} variant="row" />) : <p class="pending">首期研究正在整理。</p>}</div></div>
+      </section>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .industry-page{padding:32px 0 70px}.industry-hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:80px;align-items:end;padding:58px 0 50px;border-bottom:1px solid var(--line)}.eyebrow{margin:0 0 12px;color:var(--accent);font-size:.67rem;font-weight:720}.industry-hero h1{margin:0;font-family:"Noto Serif SC","Songti SC",SimSun,serif;font-size:clamp(2.5rem,4vw,4.2rem);line-height:1.2}.industry-hero>p{margin:0;color:var(--text-soft);font-size:.88rem;line-height:1.95}.track-grid{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line)}.track{padding:42px 46px 42px 0}.track+.track{padding-right:0;padding-left:46px;border-left:1px solid var(--line)}.track-heading{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:13px;align-items:center}.track-heading>svg{color:var(--accent)}.track-heading span{color:var(--muted);font-size:.59rem}.track-heading h2{margin:2px 0 0;font-family:"Noto Serif SC","Songti SC",SimSun,serif;font-size:1.5rem}.track-heading>strong{font-family:Georgia,serif;font-size:1rem}.track>p{max-width:570px;margin:20px 0;color:var(--muted);font-size:.78rem;line-height:1.8}.track-link{display:inline-flex;align-items:center;gap:7px;color:var(--accent);font-size:.72rem;text-decoration:none}.ai-paths,.latest-industries{padding:44px 0;border-bottom:1px solid var(--line)}.section-heading{display:flex;align-items:end;justify-content:space-between;gap:30px;margin-bottom:22px}.section-heading h2{margin:0;font-family:"Noto Serif SC","Songti SC",SimSun,serif;font-size:1.45rem}.section-heading>p{max-width:420px;margin:0;color:var(--muted);font-size:.7rem}.path-list{border-top:1px solid var(--line)}.path-list a{display:grid;grid-template-columns:40px 230px minmax(0,1fr) auto;gap:16px;align-items:center;min-height:58px;border-bottom:1px solid var(--line);color:var(--text);text-decoration:none}.path-list span{color:var(--accent);font-size:.65rem}.path-list strong{font-size:.8rem}.path-list small{color:var(--muted);font-size:.67rem}.latest-grid{display:grid;grid-template-columns:1fr 1fr;gap:52px}.latest-grid>div+div{padding-left:52px;border-left:1px solid var(--line)}.latest-grid h3{margin:0 0 14px;font-size:.8rem}.pending{padding:30px 0;color:var(--muted);font-size:.75rem}
+  @media(max-width:760px){.industry-page{padding-top:22px}.industry-hero{display:block;padding:38px 0 34px}.industry-hero h1{font-size:2.35rem}.industry-hero>p{margin-top:22px}.track-grid,.latest-grid{display:block}.track,.track+.track{padding:30px 0;border-left:0}.track+.track{border-top:1px solid var(--line)}.section-heading{display:block}.section-heading>p{margin-top:8px}.path-list a{grid-template-columns:30px minmax(0,1fr) auto;padding:13px 0}.path-list small{grid-column:2/-1}.latest-grid>div+div{margin-top:34px;padding:30px 0 0;border-top:1px solid var(--line);border-left:0}}
+</style>

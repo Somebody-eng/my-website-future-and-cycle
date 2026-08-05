@@ -1,5 +1,5 @@
 ---
-import { ArrowRight, BrainCircuit, Building2, Cpu, Search, Sprout } from "@lucide/astro";
+import { ArrowRight, BrainCircuit, Building2, Cpu, Plane, Search, Sprout } from "@lucide/astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import DailyQuote from "@components/DailyQuote.astro";
 import PeopleMap from "@components/PeopleMap.astro";
@@ -20,13 +20,14 @@ const latestDate = posts.reduce((date, post) => post.data.updatedDate > date ? p
 const readingEntrances = [
   { title: "看懂一门好生意", description: "从商业模式、现金流与护城河判断企业质量。", icon: Building2, href: categoryHref("好生意案例库"), links: ["商业模式与护城河", "现金流与财务质量", "定价权与竞争优势"] },
   { title: "提升决策质量", description: "用思维模型、概率和反向思考减少错误。", icon: BrainCircuit, href: categoryHref("芒格的思维模型"), links: ["决策框架与思维模型", "风险识别与概率思维", "激励机制与行为偏差"] },
+  { title: "研究前沿产业", description: "用商业化质量而不是新闻热度研究技术周期。", icon: Cpu, href: "/industries/", links: ["人工智能", "低空经济", "单位经济与资本开支"] },
   { title: "建立长期能力", description: "把长期主义转化为职业、学习与副业选择。", icon: Sprout, href: categoryHref("长期主义与普通人"), links: ["职业护城河", "能力复利", "副业与个人经营"] }
 ];
 
 const paths = [
   { index: "01", title: "企业质量", href: categoryHref("好生意案例库"), topics: ["现金流", "护城河", "定价权", "资本回报", "管理层"] },
   { index: "02", title: "理性决策", href: categoryHref("芒格的思维模型"), topics: ["多元模型", "反向思考", "概率", "激励机制", "能力圈"] },
-  { index: "03", title: "AI 与科技", href: categoryHref("AI与科技巨头"), topics: ["算力经济", "平台生态", "资本开支", "技术周期", "竞争优势"] },
+  { index: "03", title: "前沿产业", href: "/industries/", topics: ["人工智能", "低空经济", "资本开支", "技术周期", "单位经济"] },
   { index: "04", title: "经营者思想", href: categoryHref("人物思想地图"), topics: ["资本配置", "企业文化", "消费者导向", "长期主义", "第一性原理"] }
 ];
 const formatDate = (date: Date) => date.toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" });
@@ -45,7 +46,7 @@ const formatDate = (date: Date) => date.toLocaleDateString("zh-CN", { month: "2-
         <form class="home-search" action="/search/" method="get">
           <Search size={21} stroke-width={1.6} aria-hidden="true" />
           <label class="sr-only" for="home-search-input">搜索全站文章</label>
-          <input id="home-search-input" name="q" type="search" placeholder="搜索文章、人物、概念与案例" autocomplete="off" />
+          <input id="home-search-input" name="q" type="search" placeholder="搜索文章、产业、人物、概念与案例" autocomplete="off" />
           <button type="submit" aria-label="开始搜索"><ArrowRight size={19} stroke-width={1.6} /></button>
         </form>
         <dl class="publication-stats">
@@ -85,7 +86,7 @@ const formatDate = (date: Date) => date.toLocaleDateString("zh-CN", { month: "2-
           {meetingPreviewPosts.map(({ post, year, displayTitle }) => <a href={`/posts/${post.slug}/`}><time>{year}</time><span>{displayTitle}</span></a>)}
         </div>
       </div>
-      <aside class="tech-focus"><Cpu size={25} stroke-width={1.35} /><p class="section-label">持续观察</p><h2>AI 的热度很高，商业规律并没有失效。</h2><p>从资本开支、单位经济、平台生态和现金流约束出发，拆解科技巨头的真实竞争力。</p><a href={categoryHref("AI与科技巨头")}>进入 AI 与科技专题 <ArrowRight size={16} stroke-width={1.5} /></a></aside>
+      <aside class="tech-focus"><p class="section-label">产业观察</p><h2>技术在变化，商业规律仍是坐标。</h2><div class="industry-focus-list"><a href={categoryHref("AI与科技巨头")}><Cpu size={21} stroke-width={1.35} /><span><strong>人工智能</strong><small>算力、模型、应用、平台与治理</small></span><ArrowRight size={15} /></a><a href={categoryHref("低空经济与航空科技")}><Plane size={21} stroke-width={1.35} /><span><strong>低空经济</strong><small>飞行器、空域、适航、运营与基建</small></span><ArrowRight size={15} /></a></div><a href="/industries/">进入前沿产业研究 <ArrowRight size={16} stroke-width={1.5} /></a></aside>
     </section>
 
     <section id="latest" class="publishing-index" aria-labelledby="publishing-title">

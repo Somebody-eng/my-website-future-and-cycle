@@ -7,18 +7,19 @@ const isHome = path === "/";
 const meetingHref = "/categories/%E4%BC%AF%E5%85%8B%E5%B8%8C%E5%B0%94%E8%82%A1%E4%B8%9C%E4%BC%9A%E5%AE%9E%E5%BD%95/";
 const isMeetings = path.includes("%E4%BC%AF%E5%85%8B%E5%B8%8C%E5%B0%94") || path.includes("伯克希尔股东会实录") || path.includes("berkshire-meeting");
 const isTopics = path.startsWith("/categories") || path.startsWith("/tags");
+const isIndustries = path.startsWith("/industries") || path.includes("AI%E4%B8%8E%E7%A7%91%E6%8A%80%E5%B7%A8%E5%A4%B4") || path.includes("低空经济与航空科技");
 const isPeople = path.includes("idea-maps");
 const isSearch = path.startsWith("/search");
 ---
 
 <header class="topbar">
   <div class="topbar-inner">
-    <a class="wordmark" href="/">{SITE_SHORT_NAME}<small>商业思考 · 长期主义 · 深度研究</small></a>
+    <a class="wordmark" href="/">{SITE_SHORT_NAME}<small>长期主义商业 · 前沿产业研究</small></a>
     <nav class="desktop-nav" aria-label="主导航">
       <a class:list={{ active: isHome }} href="/">今日</a>
       <a href="/#paths">专题</a>
+      <a class:list={{ active: isIndustries }} href="/industries/">产业</a>
       <a href="/#people">人物</a>
-      <a href="/categories/%E5%A5%BD%E7%94%9F%E6%84%8F%E6%A1%88%E4%BE%8B%E5%BA%93/">案例</a>
       <a class:list={{ active: isMeetings }} href={meetingHref}>股东会</a>
     </nav>
     <div class="header-actions">
@@ -28,7 +29,7 @@ const isSearch = path.startsWith("/search");
       <details class="mobile-menu">
         <summary aria-label="打开菜单"><Menu size={23} stroke-width={1.6} /></summary>
         <nav aria-label="移动端菜单">
-          <a href="/#paths">专题阅读路径</a><a href="/#people">人物思想</a><a href="/categories/%E5%A5%BD%E7%94%9F%E6%84%8F%E6%A1%88%E4%BE%8B%E5%BA%93/">案例库</a>
+          <a href="/#paths">专题阅读路径</a><a href="/industries/">前沿产业研究</a><a href="/#people">人物思想</a><a href="/categories/%E5%A5%BD%E7%94%9F%E6%84%8F%E6%A1%88%E4%BE%8B%E5%BA%93/">案例库</a>
           <a href={meetingHref}>伯克希尔股东会实录</a><a href="/search/">搜索</a><a href="/about/">关于</a><a href="/disclaimer/">免责声明</a>
         </nav>
       </details>

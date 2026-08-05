@@ -7,7 +7,7 @@ import { categories } from "@lib/site";
 import { getPublishedPosts } from "@lib/posts";
 
 const posts = await getPublishedPosts();
-const popularTerms = ["现金流", "护城河", "定价权", "芒格", "AI", "资本配置"];
+const popularTerms = ["现金流", "护城河", "低空经济", "芒格", "AI", "单位经济"];
 ---
 
 <BaseLayout title="全站搜索" description="搜索未来与周期的文章正文、商业概念、人物、案例、栏目与标签。" canonical="/search/">
@@ -17,7 +17,7 @@ const popularTerms = ["现金流", "护城河", "定价权", "芒格", "AI", "�
         <Breadcrumb items={[{ label: "全站搜索" }]} />
         <header>
           <p class="eyebrow">SEARCH THE KNOWLEDGE BASE</p>
-          <h1>搜索文章、人物、概念与案例</h1>
+          <h1>搜索文章、产业、人物、概念与案例</h1>
           <span>在 {posts.length} 篇研究笔记与实录中检索标题、标签和正文。</span>
         </header>
         <SearchBox placeholder={`搜索 ${posts.length} 篇文章的完整正文`} />

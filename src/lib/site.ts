@@ -1,7 +1,7 @@
-export const SITE_NAME = "未来与周期｜长期主义商业思想笔记";
+export const SITE_NAME = "未来与周期｜长期主义商业与前沿产业研究";
 export const SITE_SHORT_NAME = "未来与周期";
 export const SITE_DESCRIPTION =
-  "围绕长期主义、现金流、护城河、定价权、资本配置和理性决策的中文商业思想笔记。";
+  "从长期主义和商业基本面出发，研究现金流、护城河、资本配置，以及人工智能、低空经济等前沿产业的技术演进与商业化周期。";
 export const DEFAULT_AUTHOR = "未来与周期编辑部";
 export const DEFAULT_DISCLAIMER = "本文仅用于商业与投资教育讨论，不构成任何投资建议。";
 
@@ -37,6 +37,11 @@ export const categories = [
     name: "AI与科技巨头",
     slug: "ai-tech-giants",
     description: "观察 AI 时代科技巨头的商业模式、护城河、算力投入和现金流约束。"
+  },
+  {
+    name: "低空经济与航空科技",
+    slug: "low-altitude-economy",
+    description: "从飞行器、基础设施、空域、适航与运营场景出发，研究低空产业的商业化质量和长期周期。"
   },
   {
     name: "股东信与经典文本解读",

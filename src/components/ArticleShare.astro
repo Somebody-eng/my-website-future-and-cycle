@@ -118,7 +118,7 @@ const globalPlatforms = [
         </div>
 
         <aside class="brand-card" tabindex="-1" aria-label="未来与周期分享卡片预览">
-          <div class="brand-card__brand"><span>未来与周期</span><small>长期主义商业思想笔记</small></div>
+          <div class="brand-card__brand"><span>未来与周期</span><small>长期主义商业与前沿产业研究</small></div>
           <blockquote data-card-copy>{title}</blockquote>
           <div class="brand-card__source">
             <div><span>扫码阅读全文</span><strong>future-cycle.pages.dev</strong></div>
@@ -169,7 +169,7 @@ const globalPlatforms = [
     const shareText = (source = "copy") => {
       const url = trackedUrl(source, Boolean(selectedQuote));
       if (selectedQuote) return `“${truncateShareText(selectedQuote, 260)}”\n\n——《${title}》｜未来与周期\n${url}`;
-      return `《${title}》\n${description}\n\n来自「未来与周期｜长期主义商业思想笔记」\n${url}`;
+      return `《${title}》\n${description}\n\n来自「未来与周期｜长期主义商业与前沿产业研究」\n${url}`;
     };
 
     const showToast = (message: string) => {
@@ -272,7 +272,7 @@ const globalPlatforms = [
       context.fillText("未来与周期", 82, 112);
       context.fillStyle = "#777773";
       context.font = '28px "PingFang SC", "Microsoft YaHei", sans-serif';
-      context.fillText("长期主义商业思想笔记", 82, 158);
+      context.fillText("长期主义商业与前沿产业研究", 82, 158);
       context.fillStyle = "#171717";
       context.font = selectedQuote ? '500 52px "PingFang SC", "Microsoft YaHei", sans-serif' : '600 58px "PingFang SC", "Microsoft YaHei", sans-serif';
       const cardText = selectedQuote ? `“${truncateShareText(selectedQuote, 240)}”` : title;
